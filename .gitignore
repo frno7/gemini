@@ -1,0 +1,5 @@
+*.o
+*.o.d
+/GPATH
+/GRTAGS
+/GTAGS
