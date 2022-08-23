@@ -6,8 +6,7 @@
 #ifndef INTERNAL_FILE_H
 #define INTERNAL_FILE_H
 
-#include <stdbool.h>
-#include <stddef.h>
+#include "internal/types.h"
 
 /**
  * struct file - file container
