@@ -17,6 +17,13 @@
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define BE_LE_SELECT(be, le) be
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define BE_LE_SELECT(be, le) le
+#else
+		#error "The compiler is neither big nor little endian?"
+#endif
 /* This counts to 32. Any more, it will return the 33rd argument. */
 #define __COUNT_ARGS__(							\
 	 _0,  _1,  _2,  _3,  _4,  _5,  _6,  _7,  _8,  _9, _10,		\
