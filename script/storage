@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+if [ "$1" != -o ]
+then
+	echo "$0: Missing -o option" >&2
+	exit 1
+fi
+
+shift
+output="$1"
+shift
+
+function define_head()
+{
+	echo '#include "internal/storage.h"'
+	echo
+}
+
+function define_data()
+{
+	local i=0
+	while [ $# -gt 0 ]
+	do
+		echo "static const unsigned char data$i[] = {"
+		xxd -i <"$1"
+		echo "  ,0"
+		echo "};"
+		echo
+
+		i=$(( i + 1 ))
+		shift
+	done
+}
+
+function define_file()
+{
+	echo "static const struct storage_file files[] = {"
+
+	local i=0
+	while [ $# -gt 0 ]
+	do
+		echo "  { .data = data$i, .size = sizeof(data$i) - 1, .path = "'"'"$1"'"'" },"
+
+		i=$(( i + 1 ))
+		shift
+	done
+
+	echo "  { /* Terminating entry. */ }"
+	echo "};"
+	echo
+}
+
+function define_foot()
+{
+	echo 'const struct storage_file *storage_files(void)'
+	echo '{'
+	echo '  return files;'
+	echo '}'
+}
+
+finish() {
+        rm -f "$output".tmp
+}
+trap finish EXIT
+
+define_head "$@"  >"$output".tmp
+define_data "$@" >>"$output".tmp
+define_file "$@" >>"$output".tmp
+define_foot "$@" >>"$output".tmp
+
+mv "$output".tmp "$output"
