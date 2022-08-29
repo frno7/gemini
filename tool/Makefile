@@ -6,6 +6,8 @@ TOOL_SRC =								\
 TOOL_OBJ = $(TOOL_SRC:%.c=%.o)
 TOOL = $(TOOL_SRC:%.c=%)
 
+TOOL_RSC = tool/rsc
+
 ALL_OBJ += $(TOOL_OBJ)
 
 tool/ext: $(GEMLIB)

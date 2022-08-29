@@ -6,7 +6,7 @@ TEST_RSC =								\
 
 .PHONY: $(TEST_RSC)
 $(TEST_RSC): $(TOOL)
-	$(QUIET_CHECK)$(TOOL) --identify $@
+	$(QUIET_CHECK)$(TOOL_RSC) --identify $@
 
 .PHONY: test
 test: $(TEST_RSC)
