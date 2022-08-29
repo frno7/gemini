@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 TOOL_SRC =								\
+	tool/fnt.c							\
 	tool/rsc.c
 
 TOOL_OBJ = $(TOOL_SRC:%.c=%.o)

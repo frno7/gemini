@@ -23,3 +23,18 @@ Options:
                           default is UTF-8
     --map                 display RSC map
 ```
+
+```
+Usage: fnt [options]... <FNT-file>
+
+Displays Atari TOS GEM font (FNT) file header and character set, as text
+on standard output.
+
+Options:
+
+    -h, --help            display this help and exit
+    --version             display version and exit
+
+    --identify            exit sucessfully if the file is a valid FNT
+    --diagnostic          display diagnostic warnings and errors
+```

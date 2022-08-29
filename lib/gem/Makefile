@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
 GEM_SRC =								\
+	lib/gem/fnt.c							\
 	lib/gem/rsc.c
 
-GEMLIB_SRC = $(GEM_SRC) $(X_SRC)
+GEMLIB_SRC = $(GEM_SRC)
 
-GEMLIB_OBJ = $(GEMLIB_SRC:%.c=%.o) 
+GEMLIB_OBJ = $(GEMLIB_SRC:%.c=%.o)
 
 GEMLIB = lib/gem/gemlib.a
 
