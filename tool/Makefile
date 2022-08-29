@@ -10,8 +10,7 @@ TOOL_RSC = tool/rsc
 
 ALL_OBJ += $(TOOL_OBJ)
 
-tool/ext: $(GEMLIB)
-tool/rsc: $(GEMLIB)
+$(TOOL): $(GEMLIB)
 
 $(TOOL): %: %.o $(INTERNAL_OBJ)
 	$(QUIET_LD)$(CC) $(ALL_CFLAGS) -o $@ $^
