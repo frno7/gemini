@@ -51,6 +51,35 @@ int fnt_char_width(const uint16_t c, const struct fnt *fnt)
 	return x0 >= 0 && x1 >= 0 && x0 <= x1 ? x1 - x0 : -1;
 }
 
+bool fnt_char_pixel(const int x, const int y,
+	const uint16_t c, const struct fnt *fnt)
+{
+	const struct fnt_header *h = fnt->data;
+
+	const int w = fnt_char_width(c, fnt);
+
+	if (w <= 0)
+		return false;
+
+	if (c < h->first || c > h->last ||
+	    x < 0 || x >= w ||
+	    y < 0 || y >= h->bitmap_lines)
+		return false;
+
+	const int32_t x0 = fnt_char_offset(c, fnt);
+
+	if (x0 < 0)
+		return false;
+
+	/* FIXME: Consider h->flags.big_endian */
+
+	const uint8_t *b = (const uint8_t *)fnt->data;
+	const uint8_t *d = &b[h->character_bitmap +
+			      h->bitmap_stride * y + ((x0 + x) / 8)];
+
+	return (*d & (0x80 >> ((x0 + x) % 8))) != 0;
+}
+
 static void report(void (*f)(const char *msg, void *arg), void *arg,
 	const char *prefix, const char *suffix, const char *fmt, va_list ap)
 {

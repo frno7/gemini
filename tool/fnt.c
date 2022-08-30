@@ -159,35 +159,6 @@ FNT_HEADER_FLAGS_FIELD(FNT_HEADER_FLAGS_PRINT)
 	printf("header %s undefined %x\n", symbol, flags.undefined);
 }
 
-static bool fnt_char_pixel(const int x, const int y,
-	const uint16_t c, const struct fnt *fnt)
-{
-	const struct fnt_header *h = fnt->data;
-
-	const int w = fnt_char_width(c, fnt);
-
-	if (w <= 0)
-		return false;
-
-	if (c < h->first || c > h->last ||
-	    x < 0 || x >= w ||
-	    y < 0 || y >= h->bitmap_lines)
-		return false;
-
-	const int32_t x0 = fnt_char_offset(c, fnt);
-
-	if (x0 < 0)
-		return false;
-
-	/* FIXME: Consider h->flags.big_endian */
-
-	const uint8_t *b = (const uint8_t *)h;
-	const uint8_t *d = &b[h->character_bitmap +
-			      h->bitmap_stride * y + ((x0 + x) / 8)];
-
-	return (*d & (0x80 >> ((x0 + x) % 8))) != 0;
-}
-
 static void print_fnt_char(const uint16_t c, const struct fnt *fnt)
 {
 	const struct fnt_header *h = fnt->data;
