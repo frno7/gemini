@@ -159,19 +159,6 @@ FNT_HEADER_FLAGS_FIELD(FNT_HEADER_FLAGS_PRINT)
 	printf("header %s undefined %x\n", symbol, flags.undefined);
 }
 
-static int fnt_char_width(const uint16_t c, const struct fnt *fnt)
-{
-	const struct fnt_header *h = fnt->data;
-
-	if (c < h->first || c > h->last)
-		return -1;
-
-	const int32_t x0 = fnt_char_offset(c + 0, fnt);
-	const int32_t x1 = fnt_char_offset(c + 1, fnt);
-
-	return x0 >= 0 && x1 >= 0 && x0 <= x1 ? x1 - x0 : -1;
-}
-
 static bool fnt_char_pixel(const int x, const int y,
 	const uint16_t c, const struct fnt *fnt)
 {

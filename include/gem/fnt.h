@@ -71,6 +71,8 @@ int32_t fnt_char_offset(uint16_t c, const struct fnt *fnt);
 
 int16_t fnt_char_horizontal(uint16_t c, const struct fnt *fnt);
 
+int fnt_char_width(const uint16_t c, const struct fnt *fnt);
+
 bool fnt_valid(const struct fnt *fnt);
 
 struct fnt_diagnostic {
