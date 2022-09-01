@@ -12,37 +12,31 @@
 
 int32_t fnt_char_offset(uint16_t c, const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
-	if (c < h->first || c > h->last + 1)
+	if (c < fnt->header->first || c > fnt->header->last + 1)
 		return -1;
 
-	const uint16_t k = c - h->first;
-	const uint8_t *b = (const uint8_t *)fnt->data;
+	const uint16_t k = c - fnt->header->first;
+	const uint8_t *b = (const uint8_t *)fnt->header;
 
-	return b[h->character_offsets + 2 * k + 0] |
-	      (b[h->character_offsets + 2 * k + 1] << 8);
+	return b[fnt->header->character_offsets + 2 * k + 0] |
+	      (b[fnt->header->character_offsets + 2 * k + 1] << 8);
 }
 
 int16_t fnt_char_horizontal(uint16_t c, const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
-	if (c < h->first || c > h->last)
+	if (c < fnt->header->first || c > fnt->header->last)
 		return 0;
 
-	const uint16_t k = c - h->first;
-	const uint8_t *b = (const uint8_t *)fnt->data;
+	const uint16_t k = c - fnt->header->first;
+	const uint8_t *b = (const uint8_t *)fnt->header;
 
-	return b[h->horizontal_offsets + 2 * k + 0] |
-	      (b[h->horizontal_offsets + 2 * k + 1] << 8);
+	return b[fnt->header->horizontal_offsets + 2 * k + 0] |
+	      (b[fnt->header->horizontal_offsets + 2 * k + 1] << 8);
 }
 
 int fnt_char_width(const uint16_t c, const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
-	if (c < h->first || c > h->last)
+	if (c < fnt->header->first || c > fnt->header->last)
 		return -1;
 
 	const int32_t x0 = fnt_char_offset(c + 0, fnt);
@@ -54,16 +48,14 @@ int fnt_char_width(const uint16_t c, const struct fnt *fnt)
 bool fnt_char_pixel(const int x, const int y,
 	const uint16_t c, const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
 	const int w = fnt_char_width(c, fnt);
 
 	if (w <= 0)
 		return false;
 
-	if (c < h->first || c > h->last ||
+	if (c < fnt->header->first || c > fnt->header->last ||
 	    x < 0 || x >= w ||
-	    y < 0 || y >= h->bitmap_lines)
+	    y < 0 || y >= fnt->header->bitmap_lines)
 		return false;
 
 	const int32_t x0 = fnt_char_offset(c, fnt);
@@ -71,11 +63,11 @@ bool fnt_char_pixel(const int x, const int y,
 	if (x0 < 0)
 		return false;
 
-	/* FIXME: Consider h->flags.big_endian */
+	/* FIXME: Consider fnt->header->flags.big_endian */
 
-	const uint8_t *b = (const uint8_t *)fnt->data;
-	const uint8_t *d = &b[h->character_bitmap +
-			      h->bitmap_stride * y + ((x0 + x) / 8)];
+	const uint8_t *b = (const uint8_t *)fnt->header;
+	const uint8_t *d = &b[fnt->header->character_bitmap +
+			      fnt->header->bitmap_stride * y + ((x0 + x) / 8)];
 
 	return (*d & (0x80 >> ((x0 + x) % 8))) != 0;
 }
@@ -116,31 +108,32 @@ bool fnt_valid_diagnostic(const struct fnt *fnt,
 	BUILD_BUG_ON(sizeof(struct fnt_header_flags) != 2);
 	BUILD_BUG_ON(sizeof(struct fnt_header) != 88);
 
-	const struct fnt_header *h = fnt->data;
-
-	if (fnt->size < sizeof(*h))
+	if (fnt->size < sizeof(*fnt->header))
 		return fnt_error(arg, diagnostic,
 			"Header %zu bytes too small", fnt->size);
 
-	if (h->first > h->last)
+	if (fnt->header->first > fnt->header->last)
 		return fnt_error(arg, diagnostic,
 			"First character %u greater than last %u",
-			h->first, h->last);
+			fnt->header->first, fnt->header->last);
 
-	const size_t bitmap_size = h->bitmap_stride * h->bitmap_lines;
-	const size_t bitmap_width = 8 * h->bitmap_stride;
-	const uint16_t character_count = 1 + h->last - h->first;
+	const size_t bitmap_size = fnt->header->bitmap_stride *
+				   fnt->header->bitmap_lines;
+	const size_t bitmap_width = 8 * fnt->header->bitmap_stride;
+	const uint16_t character_count =
+		1 + fnt->header->last - fnt->header->first;
 
-	if (h->flags.horizontal &&
-	    h->horizontal_offsets + 2 * character_count > fnt->size)
+	if (fnt->header->flags.horizontal &&
+	    fnt->header->horizontal_offsets + 2 * character_count > fnt->size)
 		return fnt_error(arg, diagnostic,
 			"Horizontal offset table beyond end of file");
 
-	if (h->character_offsets + 2 * (character_count + 1) > fnt->size)
+	if (fnt->header->character_offsets +
+			2 * (character_count + 1) > fnt->size)
 		return fnt_error(arg, diagnostic,
 			"Character offset table beyond end of file");
 
-	for (int c = h->first; c <= h->last; c++)
+	for (int c = fnt->header->first; c <= fnt->header->last; c++)
 		if (fnt_char_offset(c + 0, fnt) < 0)
 			return fnt_error(arg, diagnostic,
 				"Malformed offset character 0x%x", c);
@@ -156,11 +149,11 @@ bool fnt_valid_diagnostic(const struct fnt *fnt,
 				"Offset character 0x%x beyond bitmap width",
 				c + 1);
 
-	if (h->bitmap_stride % 2 != 0)
+	if (fnt->header->bitmap_stride % 2 != 0)
 		return fnt_error(arg, diagnostic,
-			"Uneven bitmap stride %u", h->bitmap_stride);
+			"Uneven bitmap stride %u", fnt->header->bitmap_stride);
 
-	if (h->character_bitmap + bitmap_size > fnt->size)
+	if (fnt->header->character_bitmap + bitmap_size > fnt->size)
 		return fnt_error(arg, diagnostic,
 			"Character bitmap beyond end of file");
 

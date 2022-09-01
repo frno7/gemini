@@ -161,18 +161,17 @@ FNT_HEADER_FLAGS_FIELD(FNT_HEADER_FLAGS_PRINT)
 
 static void print_fnt_char(const uint16_t c, const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
 	const int w = fnt_char_width(c, fnt);
 
 	printf("char 0x%x unicode 0x%x\n",
 		c, charset_atari_st_to_utf32(c, NULL));
 
 	printf("char width %d spacing %d\n", w,
-		h->flags.horizontal ? fnt_char_horizontal(c, fnt) : 0);
+		fnt->header->flags.horizontal ?
+		fnt_char_horizontal(c, fnt) : 0);
 
-	for (int y = 0; y < h->bitmap_lines; y++) {
-		printf(h->bitmap_lines <= 10 ?
+	for (int y = 0; y < fnt->header->bitmap_lines; y++) {
+		printf(fnt->header->bitmap_lines <= 10 ?
 			"char bitmap %d " : "char bitmap %2d ", y);
 		for (int x = 0; x < w; x++)
 			printf("%c", fnt_char_pixel(x, y, c, fnt) ? '#' : '.');
@@ -183,13 +182,11 @@ static void print_fnt_char(const uint16_t c, const struct fnt *fnt)
 
 static void print_fnt_info(const struct fnt *fnt)
 {
-	const struct fnt_header *h = fnt->data;
-
 #define FNT_HEADER_FIELD_PRINT(type_, symbol_, form_)			\
-	print_fnt_ ## form_(#symbol_, h->symbol_);
+	print_fnt_ ## form_(#symbol_, fnt->header->symbol_);
 FNT_HEADER_FIELD(FNT_HEADER_FIELD_PRINT)
 
-	for (uint16_t c = h->first; c <= h->last; c++)
+	for (uint16_t c = fnt->header->first; c <= fnt->header->last; c++)
 		print_fnt_char(c, fnt);
 }
 
@@ -212,7 +209,7 @@ int main(int argc, char *argv[])
 	if (!file_valid(&f))
 		pr_fatal_errno(f.path);
 
-	const struct fnt fnt = { .size = f.size, .data = f.data };
+	const struct fnt fnt = { .size = f.size, .header = f.data };
 
 	if (option.identify) {
 		const bool valid = fnt_valid(&fnt);

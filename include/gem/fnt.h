@@ -12,11 +12,6 @@
 
 #include "internal/struct.h"
 
-struct fnt {
-	size_t size;
-	const void *data;
-};
-
 struct fnt_header_name {
 	char s[32];
 } LE_STORAGE PACKED;
@@ -66,6 +61,11 @@ struct fnt_header {
 	type_ symbol_;
 FNT_HEADER_FIELD(FNT_HEADER_STRUCTURE)
 } LE_STORAGE PACKED;
+
+struct fnt {
+	size_t size;
+	struct fnt_header *header;
+};
 
 int32_t fnt_char_offset(uint16_t c, const struct fnt *fnt);
 
