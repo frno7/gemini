@@ -163,9 +163,9 @@ static void print_rsc_string_escaped(const char *s)
 static const char *rsc_object_color_label(const uint8_t color)
 {
 	switch (color) {
-#define RSC_OBJECT_COLOR_LABEL(n_, symbol_, label_, description_)	\
+#define RSC_OBJECT_COLOR_LABEL(n_, r_, g_, b_, symbol_, label_, description_)\
 	case n_: return #label_;
-RSC_OBJECT_COLOR(RSC_OBJECT_COLOR_LABEL)
+GEM_PALETTE_COLOR(RSC_OBJECT_COLOR_LABEL)
 	default: return "UNDEFINED";
 	}
 }

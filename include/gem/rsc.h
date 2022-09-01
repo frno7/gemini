@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "color.h"
+
 #include "internal/struct.h"
 
 struct rsc {
@@ -86,24 +88,6 @@ RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
 	s(2, checked,  CHECKED)						\
 	s(1, crossed,  CROSSED)						\
 	s(0, selected, SELECTED)
-
-#define RSC_OBJECT_COLOR(c)						\
-	c( 0, white,    WHITE,    "white")				\
-	c( 1, black,    BLACK,    "black")				\
-	c( 2, red,      RED,      "red")				\
-	c( 3, green,    GREEN,    "green")				\
-	c( 4, blue,     BLUE,     "blue")				\
-	c( 5, cyan,     CYAN,     "cyan")				\
-	c( 6, yellow,   YELLOW,   "yellow")				\
-	c( 7, magenta,  MAGENTA,  "magenta")				\
-	c( 8, lwhite,   LWHITE,   "light gray")				\
-	c( 9, lblack,   LBLACK,   "dark gray")				\
-	c(10, lred,     LRED,     "light red")				\
-	c(11, lgreen,   LGREEN,   "light green")			\
-	c(12, lblue,    LBLUE,    "light blue")				\
-	c(13, lcyan,    LCYAN,    "light cyan")				\
-	c(14, lyellow,  LYELLOW,  "light yellow")			\
-	c(15, lmagenta, LMAGENTA, "light magenta")
 
 struct rsc_object_color {
 	uint16_t border : 4;
