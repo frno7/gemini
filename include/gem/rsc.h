@@ -293,7 +293,7 @@ struct rsc_iconblk_pixel {
 struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	const struct rsc_iconblk *iconblk, const struct rsc *rsc);
 
-int rsc_bitblk_pixel(int x, int y,
+bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc);
 
 const struct rsc_header *rsc_header(const struct rsc *rsc);

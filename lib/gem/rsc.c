@@ -182,7 +182,7 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	};
 }
 
-int rsc_bitblk_pixel(int x, int y,
+bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc)
 {
 	const size_t offset = bitblk->bi_pdata + (x / 8) + bitblk->bi_wb * y;
@@ -192,9 +192,9 @@ int rsc_bitblk_pixel(int x, int y,
 	    x >= bitblk->bi_wb * 8 ||
 	    y >= bitblk->bi_hl ||
 	    offset >= rsc_unextended_size(rsc))
-		return 0;
+		return false;
 
-	return (b[offset] & (0x80 >> (x % 8))) ? 1 : 0;
+	return (b[offset] & (0x80 >> (x % 8))) ? true : false;
 }
 
 const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
