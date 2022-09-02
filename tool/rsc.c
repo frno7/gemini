@@ -681,14 +681,11 @@ int main(int argc, char *argv[])
 	parse_options(argc, argv);
 
 	struct file f = file_read(option.input);
+
 	if (!file_valid(&f))
 		pr_fatal_errno(option.input);
 
 	const struct rsc rsc = { .size = f.size, .data = f.data };
-	const struct rsc_diagnostic print_diagnostic = {
-		.warning = print_rsc_warning,
-		.error   = print_rsc_error,
-	};
 
 	if (option.identify) {
 		const bool valid = rsc_valid_structure(&rsc);
@@ -698,16 +695,21 @@ int main(int argc, char *argv[])
 		return valid ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
+	static const struct rsc_diagnostic print_rsc_diagnostic = {
+		.warning = print_rsc_warning,
+		.error   = print_rsc_error,
+	};
+
 	if (option.diagnostic) {
 		const bool valid = rsc_valid_structure_diagnostic(
-			&rsc, &print_diagnostic, NULL);
+			&rsc, &print_rsc_diagnostic, NULL);
 
 		file_free(&f);
 
 		return valid ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
-	if (!rsc_valid_structure_diagnostic(&rsc, &print_diagnostic, NULL))
+	if (!rsc_valid_structure_diagnostic(&rsc, &print_rsc_diagnostic, NULL))
 		goto err;
 
 	if (option.info)
