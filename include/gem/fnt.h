@@ -78,6 +78,9 @@ int fnt_cmp(const struct fnt *a, const struct fnt *b);
 bool fnt_char_pixel(const int x, const int y,
 	const uint16_t c, const struct fnt *fnt);
 
+bool fnt_char_lighten(const int x, const int y,
+	const uint16_t c, const struct fnt *fnt);
+
 bool fnt_valid(const struct fnt *fnt);
 
 struct fnt_diagnostic {

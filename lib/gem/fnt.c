@@ -83,6 +83,12 @@ bool fnt_char_pixel(const int x, const int y,
 	return (*d & (0x80 >> ((x0 + x) % 8))) != 0;
 }
 
+bool fnt_char_lighten(const int x, const int y,
+	const uint16_t c, const struct fnt *fnt)
+{
+	return (fnt->header->lighten_mask & (1 << ((x + y) & 0xf))) != 0;
+}
+
 static void report(void (*f)(const char *msg, void *arg), void *arg,
 	const char *prefix, const char *suffix, const char *fmt, va_list ap)
 {
