@@ -4,7 +4,8 @@ INTERNAL_SRC =								\
 	lib/internal/file.c						\
 	lib/internal/memory.c						\
 	lib/internal/print.c						\
-	lib/internal/string.c
+	lib/internal/string.c						\
+	lib/internal/tiff.c
 
 INTERNAL_OBJ = $(INTERNAL_SRC:%.c=%.o)
 
