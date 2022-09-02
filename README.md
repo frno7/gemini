@@ -22,6 +22,9 @@ Options:
                           display text with original or UTF-8 encoding;
                           default is UTF-8
     --map                 display RSC map
+
+    --draw                draw RSC forms and dialogues as images
+    -o, --output <path>   save images as a multipart TIFF file
 ```
 
 ```

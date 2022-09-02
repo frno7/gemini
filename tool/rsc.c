@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <gem/aes.h>
 #include <gem/rsc.h>
 
 #include "internal/assert.h"
@@ -13,7 +14,9 @@
 #include "internal/compare.h"
 #include "internal/file.h"
 #include "internal/macro.h"
+#include "internal/memory.h"
 #include "internal/print.h"
+#include "internal/tiff.h"
 
 #include "unicode/atari.h"
 #include "unicode/utf8.h"
@@ -28,7 +31,9 @@ static struct {
 	int utf8;
 	int identify;
 	int diagnostic;
+	int draw;
 	const char *input;
+	const char *output;
 } option;
 
 static void help(FILE *file)
@@ -50,6 +55,9 @@ static void help(FILE *file)
 "                          display text with original or UTF-8 encoding;\n"
 "                          default is UTF-8\n"
 "    --map                 display RSC map\n"
+"\n"
+"    --draw                draw RSC forms and dialogues as images\n"
+"    -o, --output <path>   save images as a multipart TIFF file\n"
 "\n",
 		progname);
 }
@@ -77,6 +85,8 @@ static void parse_options(int argc, char **argv)
 		{ "diagnostic",     no_argument, &option.diagnostic, 1 },
 		{ "encoding", required_argument, NULL,               0 },
 		{ "map",            no_argument, &option.map,        1 },
+		{ "draw",           no_argument, &option.draw,       1 },
+		{ "output",   required_argument, NULL,               0 },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -89,13 +99,13 @@ static void parse_options(int argc, char **argv)
 	for (;;) {
 		int index = 0;
 
-		switch (getopt_long(argc, argv, "h", options, &index)) {
+		switch (getopt_long(argc, argv, "ho:", options, &index)) {
 		case -1:
 			goto out;
 
 		case 0:
 			if (OPT("help"))
-				help_exit(EXIT_SUCCESS);
+				goto opt_h;
 			else if (OPT("version"))
 				version_exit();
 			else if (OPT("encoding")) {
@@ -106,11 +116,16 @@ static void parse_options(int argc, char **argv)
 				else
 					pr_fatal_error("invalid encoding \"%s\"\n",
 						optarg);
-			}
+			} else if (OPT("output"))
+				goto opt_o;
 			break;
 
-		case 'h':
+opt_h:		case 'h':
 			help_exit(EXIT_SUCCESS);
+
+opt_o:		case 'o':
+			option.output = optarg;
+			break;
 
 		case '?':
 			exit(EXIT_FAILURE);
@@ -127,7 +142,8 @@ out:
 
 	option.input = argv[optind];
 
-	option.info = !option.map;
+	option.info = !option.map &&
+		      !option.draw;
 }
 
 static void print_atari_st_char(const char c)
@@ -294,7 +310,7 @@ static void print_rsc_bitblk(const struct rsc_bitblk *bitblk,
 	const size_t offset, const struct rsc *rsc)
 {
 	const ssize_t i = rsc_bitblk_indexed(offset, rsc);
-	const int w = 8 * bitblk->bi_wb;
+	const int w = bitblk->bi_wb * 8;
 	const int h = bitblk->bi_hl;
 
 	if (i < 0)
@@ -666,6 +682,74 @@ static bool print_rsc_map(const struct rsc *rsc)
 	return true;
 }
 
+struct draw_rsc_arg {
+	int i;
+	aes_id_t aes_id;
+	const struct rsc_object *tree;
+	const struct rsc *rsc;
+};
+
+static bool draw_rsc_image(uint16_t *width, uint16_t *height, void *arg_)
+{
+	struct draw_rsc_arg *arg = arg_;
+
+	arg->tree = rsc_tree_at_index(arg->i++, arg->rsc);
+
+	const struct aes_area bounds =
+		aes_objc_bounds(arg->aes_id, 0, arg->tree, arg->rsc);
+
+	*width = bounds.r.w;
+	*height = bounds.r.h;
+
+	return true;
+}
+
+static bool draw_rsc_pixel(uint16_t x, uint16_t y,
+	struct tiff_pixel *pixel, void *arg_)
+{
+	struct draw_rsc_arg *arg = arg_;
+	struct vdi_color color;
+
+	if (!aes_palette_color(arg->aes_id, aes_objc_pixel(arg->aes_id,
+			x, y, arg->tree, arg->rsc), &color))
+		return true;
+
+	pixel->r = (0xffff * color.r + 500) / 1000;
+	pixel->g = (0xffff * color.g + 500) / 1000;
+	pixel->b = (0xffff * color.b + 500) / 1000;
+	pixel->a =  0xffff;
+
+	return true;
+}
+
+static bool draw_rsc(const struct rsc *rsc)
+{
+	const struct rsc_header *h = rsc_header(rsc);
+
+	if (!h)
+		return false;
+
+	struct aes aes_ = { };
+	struct draw_rsc_arg arg = {
+		.aes_id = aes_appl_init(&aes_),
+		.rsc = rsc
+	};
+	const struct tiff_image_file_f f = {
+		.image = draw_rsc_image,
+		.pixel = draw_rsc_pixel
+	};
+
+	if (!aes_id_valid(arg.aes_id))
+		pr_fatal_error("%s: Failed to open AES\n", option.input);
+
+	if (!tiff_image_file(option.output, h->rsh_ntree, &f, &arg))
+		pr_fatal_errno(option.output);
+
+	aes_appl_exit(arg.aes_id);
+
+	return true;
+}
+
 static void print_rsc_warning(const char *msg, void *arg)
 {
 	dprintf(STDERR_FILENO, "%s: warning: %s\n", option.input, msg);
@@ -714,6 +798,9 @@ int main(int argc, char *argv[])
 
 	if (option.info)
 		print_rsc_info(&rsc);
+
+	if (option.draw && !draw_rsc(&rsc))
+		goto err;
 
 	if (option.map && !print_rsc_map(&rsc)) {
 		pr_fatal_error("%s: malformed RSC structure\n", option.input);
