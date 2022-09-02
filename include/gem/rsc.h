@@ -280,6 +280,9 @@ const char *rsc_string_at_index(const size_t index, const struct rsc *rsc);
 const struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
 	const struct rsc *rsc);
 
+const struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
+	const struct rsc *rsc);
+
 size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc);
 
 const struct rsc_bitblk *rsc_frimg_at_index(const size_t index,
@@ -295,6 +298,14 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 
 bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc);
+
+const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
+	const struct rsc *rsc);
+
+size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc);
+
+const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
+	const struct rsc *rsc);
 
 const struct rsc_header *rsc_header(const struct rsc *rsc);
 
