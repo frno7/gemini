@@ -189,9 +189,15 @@ RSC_OBJECT_FIELD(RSC_OBJECT_STRUCTURE)
 	f(5, small,     SMALL)
 
 #define RSC_TEDINFO_JUST(f)						\
-	f(0, left,  LEFT)						\
-	f(1, right, RIGHT)						\
-	f(2, cntr,  CNTR)
+	f(0, left,   LEFT)						\
+	f(1, right,  RIGHT)						\
+	f(2, center, CENTER)
+
+enum {
+#define RSC_TEDINFO_JUST_ENUM(n_, symbol_, label_)			\
+	rsc_tedinfo_ ## symbol_ = n_,
+RSC_TEDINFO_JUST(RSC_TEDINFO_JUST_ENUM)
+};
 
 #define RSC_TEDINFO_FIELD(f)						\
 	f(uint32_t,                ptext,     string)			\
