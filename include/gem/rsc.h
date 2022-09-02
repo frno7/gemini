@@ -277,8 +277,6 @@ const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc);
 
 const char *rsc_string_at_index(const size_t index, const struct rsc *rsc);
 
-const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc);
-
 const struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
 	const struct rsc *rsc);
 
