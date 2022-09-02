@@ -17,6 +17,8 @@ char *xstrndup(const char *s, size_t n);
 
 bool strtoint(int *n, const char *s, int base);
 
+bool strsuffix(const char *suffix, const char *s);
+
 /**
  * struct string_split - string split cursor
  * @length: length of current substring, not necessarily NUL terminated

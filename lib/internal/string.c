@@ -65,6 +65,15 @@ bool strtoint(int *n, const char *s, int base)
 	return true;
 }
 
+bool strsuffix(const char *suffix, const char *s)
+{
+	const size_t suffix_length = strlen(suffix);
+	const size_t s_length = strlen(s);
+
+	return suffix_length <= s_length &&
+		strcmp(suffix, &s[s_length - suffix_length]) == 0;
+}
+
 struct string_split first_string_split(
 	const char *s, const char *sep,
 	char *(find)(const char *s, const char *sep))
