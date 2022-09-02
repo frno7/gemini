@@ -25,3 +25,14 @@ $(TEST_TIFF): %.tiff: %.rsc
 tiff: $(TEST_TIFF)
 
 OTHER_CLEAN += $(TEST_TIFF)
+
+TEST_PNG = $(TEST_RSC:%.rsc=%.png)
+
+.PHONY: png
+png: $(TEST_PNG)
+
+.PHONY: $(TEST_PNG)
+$(TEST_PNG): %.png: %.tiff
+	$(QUIET_GEN)magick $< +adjoin $(basename $@)-'%02d'.png
+
+OTHER_CLEAN += $(wildcard test/*.png)
