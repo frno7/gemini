@@ -4,9 +4,11 @@ TEST_RSC =								\
 	test/tos206se.rsc						\
 	test/tos206uk.rsc
 
-.PHONY: $(TEST_RSC)
-$(TEST_RSC): $(TOOL)
-	$(QUIET_CHECK)$(TOOL_RSC) --identify $@
+TEST = $(TEST_RSC:%.rsc=%)
+
+.PHONY: $(TEST)
+$(TEST): $(TOOL)
+	$(QUIET_CHECK)$(TOOL_RSC) --identify $@.rsc
 
 .PHONY: test
-test: $(TEST_RSC)
+test: $(TEST)
