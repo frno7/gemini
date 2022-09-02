@@ -6,6 +6,7 @@
 #ifndef INTERNAL_STRING_H
 #define INTERNAL_STRING_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 
 char *xstrdup(const char *s);
