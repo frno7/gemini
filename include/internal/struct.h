@@ -4,6 +4,7 @@
 #define INTERNAL_STRUCT_H
 
 #include "internal/build-assert.h"
+#include "internal/types.h"
 
 #define sizeof_member(type, member) sizeof(((type *)0)->member)
 
