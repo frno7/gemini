@@ -4,7 +4,8 @@ STORAGE_SRC = lib/gem/storage.c
 
 GEM_SRC =								\
 	lib/gem/fnt.c							\
-	lib/gem/rsc.c
+	lib/gem/rsc.c							\
+	lib/gem/vdi.c
 
 GEMLIB_SRC = $(GEM_SRC) $(STORAGE_SRC)
 
