@@ -73,6 +73,8 @@ int16_t fnt_char_horizontal(uint16_t c, const struct fnt *fnt);
 
 int fnt_char_width(const uint16_t c, const struct fnt *fnt);
 
+int fnt_cmp(const struct fnt *a, const struct fnt *b);
+
 bool fnt_char_pixel(const int x, const int y,
 	const uint16_t c, const struct fnt *fnt);
 

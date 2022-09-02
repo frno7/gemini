@@ -45,6 +45,17 @@ int fnt_char_width(const uint16_t c, const struct fnt *fnt)
 	return x0 >= 0 && x1 >= 0 && x0 <= x1 ? x1 - x0 : -1;
 }
 
+int fnt_cmp(const struct fnt *a, const struct fnt *b)
+{
+	const unsigned as = a->header->max_cell_width *
+			    a->header->bitmap_lines;
+	const unsigned bs = b->header->max_cell_width *
+			    b->header->bitmap_lines;
+
+	return as < bs ? -1 :
+	       as > bs ?  1 : 0;
+}
+
 bool fnt_char_pixel(const int x, const int y,
 	const uint16_t c, const struct fnt *fnt)
 {
