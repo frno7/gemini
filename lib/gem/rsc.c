@@ -180,6 +180,16 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	};
 }
 
+const uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc)
+{
+	if (!offset || offset > rsc_unextended_size(rsc))
+		return NULL;
+
+	const uint8_t *b = (const uint8_t *)rsc->header;
+
+	return &b[offset];
+}
+
 bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc)
 {
