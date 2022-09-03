@@ -444,7 +444,7 @@ static void print_rsc_object_type(
 	const char *label = rsc_object_g_type_label(type);
 
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" type %d %s %d\n", type.g,
+	printf(" attr type %d %s %d\n", type.g,
 		*label ? label : "G_UNDEFINED", type.m);
 }
 
@@ -456,7 +456,7 @@ static void print_rsc_object_flags(
 	const char *prefix)
 {
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" flags 0x%x", flags.mask);
+	printf(" attr flags 0x%x", flags.mask);
 
 #define RSC_OBJECT_FLAG_PRINT(bit_, symbol_, label_)			\
 	if (flags.symbol_)						\
@@ -477,7 +477,7 @@ static void print_rsc_object_state(
 	const char *prefix)
 {
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" state 0x%x", state.mask);
+	printf(" attr state 0x%x", state.mask);
 
 #define RSC_OBJECT_STATE_PRINT(bit_, symbol_, label_)			\
 	if (state.symbol_)						\
@@ -548,9 +548,9 @@ static void print_rsc_object_spec(
 	const char *prefix)
 {
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" spec");
+	printf(" attr spec");
 
-	switch (tree[ob].ob_type.g) {
+	switch (tree[ob].attr.type.g) {
 #define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, form_)		\
 	case n_: return print_rsc_object_spec_ ## form_(spec, rsc);
 RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
@@ -566,11 +566,11 @@ static void print_rsc_object_area(
 	const char *prefix)
 {
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" area x %d ch %d px", area.p.x.ch, area.p.x.px);
+	printf(" attr area x %d ch %d px", area.p.x.ch, area.p.x.px);
 	printf(" y %d ch %d px\n", area.p.y.ch, area.p.y.px);
 
 	print_rsc_object_prefix(ob, tree, prefix);
-	printf(" area w %d ch %d px", area.r.w.ch, area.r.w.px);
+	printf(" attr area w %d ch %d px", area.r.w.ch, area.r.w.px);
 	printf(" h %d ch %d px\n", area.r.h.ch, area.r.h.px);
 }
 
@@ -578,12 +578,12 @@ static void print_rsc_object(const int16_t ob,
 	const struct rsc_object *tree, const struct rsc *rsc,
 	const char *prefix)
 {
-	print_rsc_object_link (tree[ob].link,     ob, tree, rsc, prefix);
-	print_rsc_object_type (tree[ob].ob_type,  ob, tree, rsc, prefix);
-	print_rsc_object_flags(tree[ob].ob_flags, ob, tree, rsc, prefix);
-	print_rsc_object_state(tree[ob].ob_state, ob, tree, rsc, prefix);
-	print_rsc_object_spec (tree[ob].ob_spec,  ob, tree, rsc, prefix);
-	print_rsc_object_area (tree[ob].ob_area,  ob, tree, rsc, prefix);
+	print_rsc_object_link (tree[ob].link,       ob, tree, rsc, prefix);
+	print_rsc_object_type (tree[ob].attr.type,  ob, tree, rsc, prefix);
+	print_rsc_object_flags(tree[ob].attr.flags, ob, tree, rsc, prefix);
+	print_rsc_object_state(tree[ob].attr.state, ob, tree, rsc, prefix);
+	print_rsc_object_spec (tree[ob].attr.spec,  ob, tree, rsc, prefix);
+	print_rsc_object_area (tree[ob].attr.area,  ob, tree, rsc, prefix);
 }
 
 static void print_rsc_tree(const size_t i, const struct rsc *rsc)

@@ -605,7 +605,7 @@ static bool rsc_map_object(const int16_t ob, const struct rsc_object *tree,
 			sizeof(*tree), map))
 		return false;
 
-	switch (tree[ob].ob_type.g) {
+	switch (tree[ob].attr.type.g) {
 	case RSC_G_BOX:
 	case RSC_G_IBOX:
 	case RSC_G_BOXCHAR:
@@ -614,30 +614,30 @@ static bool rsc_map_object(const int16_t ob, const struct rsc_object *tree,
 	case RSC_G_BOXTEXT:
 	case RSC_G_FTEXT:
 	case RSC_G_FBOXTEXT:
-		if (!rsc_map_tedinfo(tree[ob].ob_spec.tedinfo, map, rsc))
+		if (!rsc_map_tedinfo(tree[ob].attr.spec.tedinfo, map, rsc))
 			return false;
 		break;
 	case RSC_G_IMAGE:
-		if (!rsc_map_bitblk(tree[ob].ob_spec.bitblk, map, rsc))
+		if (!rsc_map_bitblk(tree[ob].attr.spec.bitblk, map, rsc))
 			return false;
 		break;
 	case RSC_G_BUTTON:
 	case RSC_G_STRING:
 	case RSC_G_TITLE:
-		if (!rsc_map_string(tree[ob].ob_spec.string, map, rsc))
+		if (!rsc_map_string(tree[ob].attr.spec.string, map, rsc))
 			return false;
 		break;
 	case RSC_G_ICON:
-		if (!rsc_map_iconblk(tree[ob].ob_spec.iconblk, map, rsc))
+		if (!rsc_map_iconblk(tree[ob].attr.spec.iconblk, map, rsc))
 			return false;
 		break;
 	case RSC_G_PROGDEF:
-		if (!rsc_map_applblk(tree[ob].ob_spec.applblk, map, rsc))
+		if (!rsc_map_applblk(tree[ob].attr.spec.applblk, map, rsc))
 			return false;
 		break;
 	default:
 		rsc_map_warning(map_diagnostic,
-			"Object %d undefined type %d", ob, tree[ob].ob_type.g);
+			"Object %d undefined type %d", ob, tree[ob].attr.type.g);
 	}
 
 	return true;
@@ -687,7 +687,7 @@ static bool rsc_map_tree_objects(const struct rsc_object *tree,
 	}
 
 	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree)) {
-		if (tree[ob].ob_flags.lastob &&
+		if (tree[ob].attr.flags.lastob &&
 		    rsc_valid_ob(rsc_tree_traverse(ob, tree)))
 			return rsc_map_error(map_diagnostic,
 				"Tree %zu object %d not last object", i, ob);
@@ -695,7 +695,7 @@ static bool rsc_map_tree_objects(const struct rsc_object *tree,
 		lastob = ob;
 	}
 
-	if (!tree[lastob].ob_flags.lastob)
+	if (!tree[lastob].attr.flags.lastob)
 		return rsc_map_error(map_diagnostic,
 			"Tree %zu object %d lastob unset", i, lastob);
 

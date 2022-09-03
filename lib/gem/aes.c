@@ -60,7 +60,7 @@ static struct rsc_object_point rsc_tree_object_origin(int16_t ob,
 {
 	BUG_ON(!rsc_valid_ob(ob));
 
-	const int outline = tree->ob_state.outlined ? 3 : 0;
+	const int outline = tree->attr.state.outlined ? 3 : 0;
 	struct rsc_object_point origin = {
 		.x = { .px = outline },
 		.y = { .px = outline }
@@ -68,7 +68,7 @@ static struct rsc_object_point rsc_tree_object_origin(int16_t ob,
 
 	/* Ignore root object position */
 	for (; ob > 0; ob = rsc_object_parent(ob, tree))
-		origin = rsc_object_point_add(origin, tree[ob].ob_area.p);
+		origin = rsc_object_point_add(origin, tree[ob].attr.area.p);
 
 	return origin;
 }
@@ -81,18 +81,18 @@ struct aes_object_border {
 static struct aes_object_border aes_objc_border(const int ob,
 	const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	switch (tree[ob].ob_type.g) {
+	switch (tree[ob].attr.type.g) {
 	case RSC_G_BOX:
 	case RSC_G_BOXCHAR:
 		return (struct aes_object_border) {
-			.color = tree[ob].ob_spec.box.color.border,
-			.thickness = tree[ob].ob_spec.box.border_thickness
+			.color = tree[ob].attr.spec.box.color.border,
+			.thickness = tree[ob].attr.spec.box.border_thickness
 		};
 	case RSC_G_BUTTON:
 		return (struct aes_object_border) {
 			.color = 1,
-			.thickness = (tree[ob].ob_flags.exit     ? -1 : 0) +
-				     (tree[ob].ob_flags.default_ ? -1 : 0) - 1
+			.thickness = (tree[ob].attr.flags.exit     ? -1 : 0) +
+				     (tree[ob].attr.flags.default_ ? -1 : 0) - 1
 		};
 	}
 
@@ -198,7 +198,7 @@ struct aes_area aes_objc_area(aes_id_t aes_id,
 {
 	const struct aes_rectangle grid = aes_grid(aes_id);
 	const struct rsc_object_point p0 = rsc_tree_object_origin(ob, tree);
-	const struct rsc_object_rectangle r0 = tree[ob].ob_area.r;
+	const struct rsc_object_rectangle r0 = tree[ob].attr.area.r;
 
 	return (struct aes_area) {
 		.p = {
@@ -215,7 +215,7 @@ struct aes_area aes_objc_area(aes_id_t aes_id,
 struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	const int outline = tree[ob].ob_state.outlined ? -3 : 0;
+	const int outline = tree[ob].attr.state.outlined ? -3 : 0;
 	const int border = aes_objc_border(ob, tree, rsc_).thickness;
 	const int resize = min(border, outline);
 
@@ -340,19 +340,19 @@ static int aes_g_box_pixel(aes_id_t aes_id,
 		{ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF }
 	};
 
-	return (patterns[tree[ob].ob_spec.box.color.pattern & 0x7][y & 0x3] &
-		(0x8000 >> (x & 0xf))) ? tree[ob].ob_spec.box.color.fill : 0;
+	return (patterns[tree[ob].attr.spec.box.color.pattern & 0x7][y & 0x3] &
+		(0x8000 >> (x & 0xf))) ? tree[ob].attr.spec.box.color.fill : 0;
 }
 
 static int aes_g_boxchar_pixel(aes_id_t aes_id,
 	const int x, const int y, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	const char s[] = { tree[ob].ob_spec.box.c, '\0' };
+	const char s[] = { tree[ob].attr.spec.box.c, '\0' };
 
 	if (aes_string_pixel(aes_id, x, y, area, s,
 			justify_center_center, aes_char_pixel, aes_fnt_large))
-		return !tree[ob].ob_state.selected;
+		return !tree[ob].attr.state.selected;
 
 	return aes_g_box_pixel(aes_id, x, y, area, ob, tree, rsc_);
 }
@@ -362,12 +362,12 @@ static int aes_g_text_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_tedinfo *t =
-		rsc_tedinfo_at_offset(tree[ob].ob_spec.tedinfo, rsc_);
+		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
 	return aes_string_pixel(aes_id, x, y, area,
 		rsc_string_at_offset(t->te_ptext, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
-		aes_fnt_large) ^ tree[ob].ob_state.selected;
+		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
 
 static int aes_g_ftext_pixel(aes_id_t aes_id,
@@ -375,12 +375,12 @@ static int aes_g_ftext_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_tedinfo *t =
-		rsc_tedinfo_at_offset(tree[ob].ob_spec.tedinfo, rsc_);
+		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
 	return aes_string_pixel(aes_id, x, y, area,
 		rsc_string_at_offset(t->te_ptmplt, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
-		aes_fnt_large) ^ tree[ob].ob_state.selected;
+		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
 
 static int aes_g_string_pixel(aes_id_t aes_id,
@@ -388,11 +388,11 @@ static int aes_g_string_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return aes_string_pixel(aes_id, x, y, area,
-		rsc_string_at_offset(tree[ob].ob_spec.string, rsc_),
-		justify_center_left, tree[ob].ob_state.disabled ?
+		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
+		justify_center_left, tree[ob].attr.state.disabled ?
 			aes_char_pixel_lighten : aes_char_pixel,
 		aes_fnt_large) ^
-		tree[ob].ob_state.selected;
+		tree[ob].attr.state.selected;
 }
 
 static int aes_g_button_pixel(aes_id_t aes_id,
@@ -400,9 +400,9 @@ static int aes_g_button_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return aes_string_pixel(aes_id, x, y, area,
-		rsc_string_at_offset(tree[ob].ob_spec.string, rsc_),
+		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
 		justify_center_center, aes_char_pixel, aes_fnt_large) ^
-		tree[ob].ob_state.selected;
+		tree[ob].attr.state.selected;
 }
 
 static int aes_g_image_pixel(aes_id_t aes_id,
@@ -410,7 +410,7 @@ static int aes_g_image_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_bitblk *bitblk =
-		rsc_bitblk_at_offset(tree[ob].ob_spec.bitblk, rsc_);
+		rsc_bitblk_at_offset(tree[ob].attr.spec.bitblk, rsc_);
 
 	if (!bitblk)
 		return 0;
@@ -434,7 +434,7 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_iconblk *iconblk =
-		rsc_iconblk_at_offset(tree[ob].ob_spec.iconblk, rsc_);
+		rsc_iconblk_at_offset(tree[ob].attr.spec.iconblk, rsc_);
 
 	if (!iconblk)
 		return 0;
@@ -554,10 +554,10 @@ int aes_objc_pixel(aes_id_t aes_id, const int x, const int y,
 	if (aes_area_border(x, y, area, border.thickness))
 		return border.color;
 
-	if (tree[ob].ob_state.outlined && aes_area_outline(x, y, area))
+	if (tree[ob].attr.state.outlined && aes_area_outline(x, y, area))
 		return border.color;
 
-	switch (tree[ob].ob_type.g) {
+	switch (tree[ob].attr.type.g) {
 #define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, form_)		\
 	case n_: return aes_g_ ## symbol_ ## _pixel(			\
 		aes_id, x, y, area, ob, tree, rsc_);
