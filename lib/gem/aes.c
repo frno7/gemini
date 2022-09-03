@@ -365,7 +365,7 @@ static int aes_g_text_pixel(aes_id_t aes_id,
 		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
 	return aes_string_pixel(aes_id, x, y, area,
-		rsc_string_at_offset(t->te_ptext, rsc_),
+		rsc_string_at_offset(t->te_text, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
 		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
@@ -378,7 +378,7 @@ static int aes_g_ftext_pixel(aes_id_t aes_id,
 		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
 	return aes_string_pixel(aes_id, x, y, area,
-		rsc_string_at_offset(t->te_ptmplt, rsc_),
+		rsc_string_at_offset(t->te_tmplt, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
 		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }

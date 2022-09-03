@@ -546,9 +546,9 @@ static bool rsc_map_tedinfo(const size_t tedinfo_offset,
 			tedinfo_offset, sizeof(struct rsc_tedinfo), map))
 		return false;
 
-	return rsc_map_string(tedinfo->te_ptext,  map, rsc) &&
-	       rsc_map_string(tedinfo->te_ptmplt, map, rsc) &&
-	       rsc_map_string(tedinfo->te_pvalid, map, rsc);
+	return rsc_map_string(tedinfo->te_text,  map, rsc) &&
+	       rsc_map_string(tedinfo->te_tmplt, map, rsc) &&
+	       rsc_map_string(tedinfo->te_valid, map, rsc);
 }
 
 static bool rsc_map_iconblk(const size_t iconblk_offset,

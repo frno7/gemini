@@ -140,9 +140,9 @@ GEM_TEDINFO_JUSTIFICATION(RSC_TEDINFO_JUSTIFICATION_ENUM)
 };
 
 #define RSC_TEDINFO_FIELD(f)						\
-	f(uint32_t,                ptext,     string)			\
-	f(uint32_t,                ptmplt,    string)			\
-	f(uint32_t,                pvalid,    string)			\
+	f(uint32_t,                text,      string)			\
+	f(uint32_t,                tmplt,     string)			\
+	f(uint32_t,                valid,     string)			\
 	f(int16_t,                 font,      font)			\
 	f(int16_t,                 fontid,    integer)			\
 	f(int16_t,                 just,      just)			\
