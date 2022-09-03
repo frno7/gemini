@@ -942,25 +942,25 @@ static bool rsc_valid_map(const struct rsc *rsc,
 bool rsc_valid_structure_diagnostic(const struct rsc *rsc,
 	const struct rsc_diagnostic *diagnostic, void *arg)
 {
-	BUILD_BUG_ON(sizeof(struct rsc_header)            != 36);
-	BUILD_BUG_ON(sizeof(struct rsc_object_color)      !=  2);
-	BUILD_BUG_ON(sizeof(struct rsc_object_spec)       !=  4);
-	BUILD_BUG_ON(sizeof(struct rsc_object_type)       !=  2);
-	BUILD_BUG_ON(sizeof(struct rsc_object_flags)      !=  2);
-	BUILD_BUG_ON(sizeof(struct rsc_object_state)      !=  2);
-	BUILD_BUG_ON(sizeof(struct rsc_object_grid)       !=  2);
-	BUILD_BUG_ON(sizeof(struct rsc_object_point)      !=  4);
-	BUILD_BUG_ON(sizeof(struct rsc_object_rectangle)  !=  4);
-	BUILD_BUG_ON(sizeof(struct rsc_object_area)       !=  8);
-	BUILD_BUG_ON(sizeof(struct rsc_object)            != 24);
-	BUILD_BUG_ON(sizeof(struct rsc_tedinfo)           != 28);
-	BUILD_BUG_ON(sizeof(struct rsc_bitblk)            != 14);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk_color)     !=  1);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk_point)     !=  4);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk_char)      !=  6);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk_rectangle) !=  4);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk_area)      !=  8);
-	BUILD_BUG_ON(sizeof(struct rsc_iconblk)           != 34);
+	BUILD_BUG_ON(sizeof(struct rsc_header)             != 36);
+	BUILD_BUG_ON(sizeof(struct rsc_object_color)       !=  2);
+	BUILD_BUG_ON(sizeof(struct rsc_object_spec)        !=  4);
+	BUILD_BUG_ON(sizeof(struct rsc_object_type)        !=  2);
+	BUILD_BUG_ON(sizeof(struct rsc_object_flags)       !=  2);
+	BUILD_BUG_ON(sizeof(struct rsc_object_state)       !=  2);
+	BUILD_BUG_ON(sizeof(struct rsc_object_grid)        !=  2);
+	BUILD_BUG_ON(sizeof(struct rsc_object_point)       !=  4);
+	BUILD_BUG_ON(sizeof(struct rsc_object_rectangle)   !=  4);
+	BUILD_BUG_ON(sizeof(struct rsc_object_area)        !=  8);
+	BUILD_BUG_ON(sizeof(struct rsc_object)             != 24);
+	BUILD_BUG_ON(sizeof(struct rsc_tedinfo)            != 28);
+	BUILD_BUG_ON(sizeof(struct rsc_bitblk)             != 14);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk_char_color) !=  1);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk_point)      !=  4);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk_char)       !=  6);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk_rectangle)  !=  4);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk_area)       !=  8);
+	BUILD_BUG_ON(sizeof(struct rsc_iconblk)            != 34);
 
 	if (!rsc_valid_header(rsc))
 		return rsc_error(arg, diagnostic, "Malformed header");

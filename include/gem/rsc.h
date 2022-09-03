@@ -171,7 +171,7 @@ struct rsc_bitblk {
 RSC_BITBLK_FIELD(RSC_BITBLK_STRUCTURE)
 } BE_STORAGE PACKED;
 
-struct rsc_iconblk_color {
+struct rsc_iconblk_char_color {
 	uint8_t fg : 4;
 	uint8_t bg : 4;
 } BE_STORAGE PACKED;
@@ -194,7 +194,7 @@ struct rsc_iconblk_area {
 } BE_STORAGE PACKED;
 
 struct rsc_iconblk_char {
-        struct rsc_iconblk_color color;
+        struct rsc_iconblk_char_color color;
         char c;
         struct rsc_iconblk_point p;
 } BE_STORAGE PACKED;
