@@ -244,6 +244,8 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 
 const uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc);
 
+size_t rsc_bitblk_bitmap_size(const struct rsc_bitblk *bitblk);
+
 bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc);
 
