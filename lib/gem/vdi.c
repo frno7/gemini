@@ -51,7 +51,7 @@ GEM_PALETTE_COLOR(VDI_SYSTEM_COLOR)
 		if (strsuffix(".fnt", file->path)) {
 			const struct fnt fnt = {
 				.size = file->size,
-				.header = (struct fnt_header *)file->data
+				.header = file->data
 			};
 
 			if (!vdi_v_fontinit(vdi_id, &fnt))

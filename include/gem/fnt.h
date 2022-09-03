@@ -64,7 +64,7 @@ FNT_HEADER_FIELD(FNT_HEADER_STRUCTURE)
 
 struct fnt {
 	size_t size;
-	struct fnt_header *header;
+	const struct fnt_header *header;
 };
 
 int32_t fnt_char_offset(uint16_t c, const struct fnt *fnt);
