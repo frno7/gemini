@@ -159,10 +159,8 @@ struct rsc_object_rectangle {
 } BE_STORAGE PACKED;
 
 struct rsc_object_area {
-	struct {
-		struct rsc_object_point p;
-		struct rsc_object_rectangle r;
-	} BE_STORAGE PACKED;
+	struct rsc_object_point p;
+	struct rsc_object_rectangle r;
 } BE_STORAGE PACKED;
 
 #define RSC_OBJECT_FIELD(f)						\
