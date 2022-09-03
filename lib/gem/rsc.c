@@ -281,12 +281,12 @@ int16_t rsc_object_parent(int16_t ob, const struct rsc_object *tree)
 	BUG_ON(!rsc_valid_ob(ob));
 
 	for (;;) {
-		const int16_t nx = tree[ob].ob_next;
+		const int16_t nx = tree[ob].link.next;
 
 		if (!rsc_valid_ob(nx))
 			return nx;		/* There is no parent */
 
-		if (ob == tree[nx].ob_tail)
+		if (ob == tree[nx].link.tail)
 			return nx;		/* Parent found */
 
 		ob = nx;			/* Advance to sibling */
@@ -297,16 +297,16 @@ int16_t rsc_tree_traverse(int16_t ob, const struct rsc_object *tree)
 {
 	BUG_ON(!rsc_valid_ob(ob));
 
-	if (rsc_valid_ob(tree[ob].ob_head))
-		return tree[ob].ob_head;	/* Advance to the child */
+	if (rsc_valid_ob(tree[ob].link.head))
+		return tree[ob].link.head;	/* Advance to the child */
 
 	for (;;) {
-		const int16_t nx = tree[ob].ob_next;
+		const int16_t nx = tree[ob].link.next;
 
 		if (!rsc_valid_ob(nx))
 			return nx;		/* Unable to advance */
 
-		if (ob != tree[nx].ob_tail)
+		if (ob != tree[nx].link.tail)
 			return nx;		/* Advance to the sibling */
 
 		ob = nx;			/* Advance to the parent */
@@ -595,9 +595,9 @@ static bool rsc_map_object(const int16_t ob, const struct rsc_object *tree,
 	struct rsc_map *map = map_diagnostic->map;
 	const struct rsc *rsc = map_diagnostic->rsc;
 
-	if (!rsc_valid_object_index(tree[ob].ob_next, tree_offset, rsc) ||
-	    !rsc_valid_object_index(tree[ob].ob_head, tree_offset, rsc) ||
-	    !rsc_valid_object_index(tree[ob].ob_tail, tree_offset, rsc))
+	if (!rsc_valid_object_index(tree[ob].link.next, tree_offset, rsc) ||
+	    !rsc_valid_object_index(tree[ob].link.head, tree_offset, rsc) ||
+	    !rsc_valid_object_index(tree[ob].link.tail, tree_offset, rsc))
 		return false;
 
 	if (!rsc_map_mark_type(rsc_map_entry_type_object,
@@ -667,23 +667,23 @@ static bool rsc_map_tree_objects(const struct rsc_object *tree,
 				"Tree %zu object %d malformed", i, ob);
 
 	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree)) {
-		if (tree[ob].ob_head == -1)
+		if (tree[ob].link.head == -1)
 			continue;
 
-		if (tree[ob].ob_tail < 0)
+		if (tree[ob].link.tail < 0)
 			return rsc_map_error(map_diagnostic,
 				"Tree %zu object %d invalid tail %d",
-				i, ob, tree[ob].ob_tail);
+				i, ob, tree[ob].link.tail);
 
-		if (!rsc_mapped_object(tree[ob].ob_tail,
+		if (!rsc_mapped_object(tree[ob].link.tail,
 				tree, tree_offset, map_diagnostic->map))
 			return rsc_map_error(map_diagnostic,
 				"Tree %zu object %d malformed", i, ob);
 
-		if (tree[tree[ob].ob_tail].ob_next != ob) /* Parent link */
+		if (tree[tree[ob].link.tail].link.next != ob) /* Parent link */
 			return rsc_map_error(map_diagnostic,
 				"Tree %zu object %d invalid parent %d != %d",
-				i, ob, tree[tree[ob].ob_tail].ob_next, ob);
+				i, ob, tree[tree[ob].link.tail].link.next, ob);
 	}
 
 	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree)) {

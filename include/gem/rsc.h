@@ -163,20 +163,17 @@ struct rsc_object_area {
 	struct rsc_object_rectangle r;
 } BE_STORAGE PACKED;
 
-#define RSC_OBJECT_FIELD(f)						\
-	f(int16_t,                 next,   integer)			\
-	f(int16_t,                 head,   integer)			\
-	f(int16_t,                 tail,   integer)			\
-	f(struct rsc_object_type,  type,   type)			\
-	f(struct rsc_object_flags, flags,  flags)			\
-	f(struct rsc_object_state, state,  state)			\
-	f(struct rsc_object_spec,  spec,   spec)			\
-	f(struct rsc_object_area,  area,   area)
-
 struct rsc_object {
-#define RSC_OBJECT_STRUCTURE(type_, name_, form_)			\
-	type_ ob_ ## name_;
-RSC_OBJECT_FIELD(RSC_OBJECT_STRUCTURE)
+	struct rsc_object_link {
+		int16_t next;
+		int16_t head;
+		int16_t tail;
+	} BE_STORAGE PACKED link;
+	struct rsc_object_type ob_type;
+	struct rsc_object_flags ob_flags;
+	struct rsc_object_state ob_state;
+	struct rsc_object_spec ob_spec;
+	struct rsc_object_area ob_area;
 } BE_STORAGE PACKED;
 
 #define RSC_TEDINFO_FONT(f)						\
