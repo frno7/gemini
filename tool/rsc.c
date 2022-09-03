@@ -201,12 +201,12 @@ GEM_TEDINFO_FONT(RSC_TEDINFO_FONT_LABEL)
 	}
 }
 
-static const char *rsc_tedinfo_just_label(const uint16_t te_just)
+static const char *rsc_tedinfo_justificaion_label(const uint16_t te_just)
 {
 	switch (te_just) {
-#define RSC_TEDINFO_JUST_LABEL(n_, symbol_, label_)			\
+#define RSC_TEDINFO_JUSTIFICATION_LABEL(n_, symbol_, label_)		\
 	case n_: return #label_;
-RSC_TEDINFO_JUST(RSC_TEDINFO_JUST_LABEL)
+GEM_TEDINFO_JUSTIFICATION(RSC_TEDINFO_JUSTIFICATION_LABEL)
 	default: return "UNDEFINED";
 	}
 }
@@ -373,7 +373,7 @@ static void print_rsc_tedinfo_just(const char *name,
 	const size_t tedinfo_offset, const struct rsc *rsc)
 {
 	printf("tedinfo %zd %s %d %s\n", tedinfo_offset, name,
-		te_just, rsc_tedinfo_just_label(te_just));
+		te_just, rsc_tedinfo_justificaion_label(te_just));
 }
 
 static void print_rsc_tedinfo_color(const char *name,

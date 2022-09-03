@@ -139,15 +139,10 @@ struct rsc_object {
 	} BE_STORAGE PACKED attr;
 } BE_STORAGE PACKED;
 
-#define RSC_TEDINFO_JUST(f)						\
-	f(0, left,   LEFT)						\
-	f(1, right,  RIGHT)						\
-	f(2, center, CENTER)
-
 enum {
-#define RSC_TEDINFO_JUST_ENUM(n_, symbol_, label_)			\
+#define RSC_TEDINFO_JUSTIFICATION_ENUM(n_, symbol_, label_)		\
 	rsc_tedinfo_ ## symbol_ = n_,
-RSC_TEDINFO_JUST(RSC_TEDINFO_JUST_ENUM)
+GEM_TEDINFO_JUSTIFICATION(RSC_TEDINFO_JUSTIFICATION_ENUM)
 };
 
 #define RSC_TEDINFO_FIELD(f)						\

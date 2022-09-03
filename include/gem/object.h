@@ -53,4 +53,9 @@
 	f(3, large,     LARGE)						\
 	f(5, small,     SMALL)
 
+#define GEM_TEDINFO_JUSTIFICATION(f)					\
+	f(0, left,   LEFT)						\
+	f(1, right,  RIGHT)						\
+	f(2, center, CENTER)
+
 #endif /* _GEM_OBJECT_H */
