@@ -493,7 +493,7 @@ RSC_OBJECT_STATE(RSC_OBJECT_STATE_PRINT)
 static void print_rsc_object_spec_box(
 	const struct rsc_object_spec spec, const struct rsc *rsc)
 {
-	printf(" box %d px ", spec.box.border_thickness);
+	printf(" box %d px ", spec.box.thickness);
 	print_rsc_object_color(spec.box.color, rsc);
 	puts("");
 }

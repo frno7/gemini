@@ -86,7 +86,7 @@ static struct aes_object_border aes_objc_border(const int ob,
 	case RSC_G_BOXCHAR:
 		return (struct aes_object_border) {
 			.color = tree[ob].attr.spec.box.color.border,
-			.thickness = tree[ob].attr.spec.box.border_thickness
+			.thickness = tree[ob].attr.spec.box.thickness
 		};
 	case RSC_G_BUTTON:
 		return (struct aes_object_border) {

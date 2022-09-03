@@ -101,7 +101,7 @@ struct rsc_object_spec {
 	union {
 		struct rsc_object_spec_box {
 			char c;
-			int8_t border_thickness;
+			int8_t thickness;
 			struct rsc_object_color color;
 		} BE_STORAGE PACKED box;
 		uint32_t tedinfo;
