@@ -183,7 +183,7 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc)
 {
-	const size_t offset = bitblk->bi_pdata + (x / 8) + bitblk->bi_wb * y;
+	const size_t offset = bitblk->bi_data + (x / 8) + bitblk->bi_wb * y;
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (x < 0 || y < 0 ||
@@ -485,7 +485,7 @@ static bool rsc_map_bitblk(const size_t bitblk_offset,
 		return false;
 
 	if (!rsc_map_mark_type(rsc_map_entry_type_imdata,
-			bitblk->bi_pdata, bitblk->bi_wb * bitblk->bi_hl, map))
+			bitblk->bi_data, bitblk->bi_wb * bitblk->bi_hl, map))
 		return false;
 
 	return true;

@@ -159,7 +159,7 @@ RSC_TEDINFO_FIELD(RSC_TEDINFO_STRUCTURE)
 } BE_STORAGE PACKED;
 
 #define RSC_BITBLK_FIELD(f)						\
-	f(uint32_t, pdata)						\
+	f(uint32_t, data)						\
 	f(int16_t,  wb)							\
 	f(int16_t,  hl)							\
 	f(int16_t,  x)							\
