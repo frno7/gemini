@@ -139,13 +139,6 @@ struct rsc_object {
 	} BE_STORAGE PACKED attr;
 } BE_STORAGE PACKED;
 
-#define RSC_TEDINFO_FONT(f)						\
-	f(0, gdos_prop, GDOS_PROP)					\
-	f(1, gdos_mono, GDOS_MONO)					\
-	f(2, gdos_bitm, GDOS_BITM)					\
-	f(3, large,     LARGE)						\
-	f(5, small,     SMALL)
-
 #define RSC_TEDINFO_JUST(f)						\
 	f(0, left,   LEFT)						\
 	f(1, right,  RIGHT)						\

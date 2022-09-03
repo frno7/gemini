@@ -196,7 +196,7 @@ static const char *rsc_tedinfo_font_label(const uint16_t te_font)
 	switch (te_font) {
 #define RSC_TEDINFO_FONT_LABEL(n_, symbol_, label_)			\
 	case n_: return #label_;
-RSC_TEDINFO_FONT(RSC_TEDINFO_FONT_LABEL)
+GEM_TEDINFO_FONT(RSC_TEDINFO_FONT_LABEL)
 	default: return "UNDEFINED";
 	}
 }

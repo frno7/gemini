@@ -46,4 +46,11 @@
 	s(1, crossed,  CROSSED)						\
 	s(0, selected, SELECTED)
 
+#define GEM_TEDINFO_FONT(f)						\
+	f(0, gdos_prop, GDOS_PROP)					\
+	f(1, gdos_mono, GDOS_MONO)					\
+	f(2, gdos_bitm, GDOS_BITM)					\
+	f(3, large,     LARGE)						\
+	f(5, small,     SMALL)
+
 #endif /* _GEM_OBJECT_H */
