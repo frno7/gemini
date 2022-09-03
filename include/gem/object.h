@@ -37,4 +37,13 @@
 	f( 1, default_,   DEFAULT)					\
 	f( 0, selectable, SELECTABLE)
 
+/* Reverse order for proper BE_STORAGE structure bit field order. */
+#define GEM_OBJECT_STATE(s)						\
+	s(5, shadowed, SHADOWED)					\
+	s(4, outlined, OUTLINED)					\
+	s(3, disabled, DISABLED)					\
+	s(2, checked,  CHECKED)						\
+	s(1, crossed,  CROSSED)						\
+	s(0, selected, SELECTED)
+
 #endif /* _GEM_OBJECT_H */

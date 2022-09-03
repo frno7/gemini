@@ -50,15 +50,6 @@ enum {
 GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
 };
 
-/* Reverse order for proper BE_STORAGE structure bit field order. */
-#define RSC_OBJECT_STATE(s)						\
-	s(5, shadowed, SHADOWED)					\
-	s(4, outlined, OUTLINED)					\
-	s(3, disabled, DISABLED)					\
-	s(2, checked,  CHECKED)						\
-	s(1, crossed,  CROSSED)						\
-	s(0, selected, SELECTED)
-
 struct rsc_object_color {
 	uint16_t border : 4;
 	uint16_t text : 4;
@@ -107,7 +98,7 @@ struct rsc_object_state {
 			uint16_t undefined : 10;
 #define RSC_OBJECT_STATE_STRUCT(bit_, symbol_, label_)			\
 			uint16_t symbol_ : 1;
-RSC_OBJECT_STATE(RSC_OBJECT_STATE_STRUCT)
+GEM_OBJECT_STATE(RSC_OBJECT_STATE_STRUCT)
 		} BE_STORAGE PACKED;
 		uint16_t mask;
 	} BE_STORAGE PACKED;

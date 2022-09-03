@@ -482,7 +482,7 @@ static void print_rsc_object_state(
 #define RSC_OBJECT_STATE_PRINT(bit_, symbol_, label_)			\
 	if (state.symbol_)						\
 		printf(" %s", #label_);
-RSC_OBJECT_STATE(RSC_OBJECT_STATE_PRINT)
+GEM_OBJECT_STATE(RSC_OBJECT_STATE_PRINT)
 
 	if (state.undefined)
 		printf(" UNDEFINED_0x%x", state.undefined);
