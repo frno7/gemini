@@ -31,10 +31,10 @@ without optimisations, but there are several advantages:
   [memory footprint](https://en.wikipedia.org/wiki/Memory_footprint)
   regardless of video resolution;
 - [flicker-free](https://en.wikipedia.org/wiki/Flicker-free) video updates
-  are possible without double-buffering, because no intermediate drawing is
-  necessary;
+  without [double buffering](https://en.wikipedia.org/wiki/Multiple_buffering)
+  are possible, because no intermediate drawing is necessary;
 - [write-only memory](https://en.wikipedia.org/wiki/Write-only_memory_(engineering))
-  can be used for the video display.
+  can be used for the video display;
 - finally, drawing is
   [pleasingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel),
   because all pixels are independent of one another, so modern
