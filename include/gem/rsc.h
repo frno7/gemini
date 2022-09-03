@@ -200,12 +200,12 @@ struct rsc_iconblk_char {
 } BE_STORAGE PACKED;
 
 #define RSC_ICONBLK_FIELD(f)						\
-        f(uint32_t,                pmask)				\
-        f(uint32_t,                pdata)				\
-        f(uint32_t,                ptext)				\
+        f(uint32_t,                mask)				\
+        f(uint32_t,                data)				\
+        f(uint32_t,                text)				\
         f(struct rsc_iconblk_char, char)				\
         f(struct rsc_iconblk_area, icon)				\
-        f(struct rsc_iconblk_area, text)
+        f(struct rsc_iconblk_area, txt)
 
 struct rsc_iconblk {
 #define RSC_ICONBLK_STRUCTURE(type_, name_) type_ ib_ ## name_;

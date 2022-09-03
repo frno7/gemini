@@ -267,13 +267,13 @@ static void print_rsc_iconblk(const struct rsc_iconblk *iconblk,
 	} else
 		puts(" NUL");
 
-	const char *text = rsc_string_at_offset(iconblk->ib_ptext, rsc);
+	const char *text = rsc_string_at_offset(iconblk->ib_text, rsc);
 	BUG_ON(!text);
 	printf("iconblk %zd text x %d px y %d px w %d px h %d px string %u \"",
 		offset,
-		iconblk->ib_text.p.x, iconblk->ib_text.p.y,
-		iconblk->ib_text.r.w, iconblk->ib_text.r.h,
-		iconblk->ib_ptext);
+		iconblk->ib_txt.p.x, iconblk->ib_txt.p.y,
+		iconblk->ib_txt.r.w, iconblk->ib_txt.r.h,
+		iconblk->ib_text);
 	print_rsc_string_escaped(text);
 	puts("\"");
 

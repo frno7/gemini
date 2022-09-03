@@ -163,8 +163,8 @@ const struct rsc_bitblk *rsc_frimg_at_index(const size_t i,
 struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	const struct rsc_iconblk *iconblk, const struct rsc *rsc)
 {
-	const size_t data_offset = iconblk->ib_pdata + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
-	const size_t mask_offset = iconblk->ib_pmask + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
+	const size_t data_offset = iconblk->ib_data + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
+	const size_t mask_offset = iconblk->ib_mask + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (x < 0 || y < 0 ||
@@ -567,15 +567,15 @@ static bool rsc_map_iconblk(const size_t iconblk_offset,
 	if (iconblk->ib_icon.r.w % 16)
 		return false;
 
-	if (!rsc_map_mark_type(rsc_map_entry_type_imdata, iconblk->ib_pmask,
+	if (!rsc_map_mark_type(rsc_map_entry_type_imdata, iconblk->ib_mask,
 			(iconblk->ib_icon.r.w / 8) * iconblk->ib_icon.r.h, map))
 		return false;
 
-	if (!rsc_map_mark_type(rsc_map_entry_type_imdata, iconblk->ib_pdata,
+	if (!rsc_map_mark_type(rsc_map_entry_type_imdata, iconblk->ib_data,
 			(iconblk->ib_icon.r.w / 8) * iconblk->ib_icon.r.h, map))
 		return false;
 
-	if (!rsc_map_string(iconblk->ib_ptext, map, rsc))
+	if (!rsc_map_string(iconblk->ib_text, map, rsc))
 		return false;
 
 	return true;

@@ -471,18 +471,18 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 
 	const struct aes_area text_area = (struct aes_area) {
 		.p = {
-			.x = area.p.x + iconblk->ib_text.p.x,
-			.y = area.p.y + iconblk->ib_text.p.y
+			.x = area.p.x + iconblk->ib_txt.p.x,
+			.y = area.p.y + iconblk->ib_txt.p.y
 		},
 		.r = {
-			.w = iconblk->ib_text.r.w,
-			.h = iconblk->ib_text.r.h
+			.w = iconblk->ib_txt.r.w,
+			.h = iconblk->ib_txt.r.h
 		}
 	};
 
 	if (aes_area_within(x, y, text_area))
 		return aes_string_pixel(aes_id, x, y, text_area,
-			rsc_string_at_offset(iconblk->ib_ptext, rsc_),
+			rsc_string_at_offset(iconblk->ib_text, rsc_),
 			justify_center_center, aes_char_pixel, aes_fnt_small);
 
 	if (!aes_area_within(x, y, icon_area))
