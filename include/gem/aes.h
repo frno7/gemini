@@ -42,6 +42,10 @@ static inline bool aes_id_valid(aes_id_t aes_id)
 	return vdi_id_valid(aes_id.aes_->vdi_id);
 }
 
+struct fnt *aes_fnt_large(aes_id_t aes_id);
+
+struct fnt *aes_fnt_small(aes_id_t aes_id);
+
 void aes_appl_exit(aes_id_t aes_id);
 
 bool aes_palette_color(aes_id_t aes_id,

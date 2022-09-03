@@ -101,12 +101,12 @@ static struct aes_object_border aes_objc_border(const int ob,
 
 typedef struct fnt *(*aes_fnt_f)(aes_id_t aes_id);
 
-static struct fnt *aes_fnt_large(aes_id_t aes_id)
+struct fnt *aes_fnt_large(aes_id_t aes_id)
 {
 	return aes_id.aes_->vdi_id.vdi->font.large;
 }
 
-static struct fnt *aes_fnt_small(aes_id_t aes_id)
+struct fnt *aes_fnt_small(aes_id_t aes_id)
 {
 	return aes_id.aes_->vdi_id.vdi->font.small;
 }
