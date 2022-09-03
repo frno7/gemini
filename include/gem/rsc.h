@@ -51,21 +51,6 @@ GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
 };
 
 /* Reverse order for proper BE_STORAGE structure bit field order. */
-#define RSC_OBJECT_FLAG(f)						\
-	f(11, submenu,    SUBMENU)					\
-	f(10, fl3dact,    FL3DACT)					\
-	f( 9, fl3dind,    FL3DIND)					\
-	f( 8, indirect,   INDIRECT)					\
-	f( 7, hidetree,   HIDETREE)					\
-	f( 6, touchexit,  TOUCHEXIT)					\
-	f( 5, lastob,     LASTOB)					\
-	f( 4, rbutton,    RBUTTON)					\
-	f( 3, editable,   EDITABLE)					\
-	f( 2, exit,       EXIT)						\
-	f( 1, default_,   DEFAULT)					\
-	f( 0, selectable, SELECTABLE)
-
-/* Reverse order for proper BE_STORAGE structure bit field order. */
 #define RSC_OBJECT_STATE(s)						\
 	s(5, shadowed, SHADOWED)					\
 	s(4, outlined, OUTLINED)					\
@@ -110,7 +95,7 @@ struct rsc_object_flags {
 			uint16_t undefined : 4;
 #define RSC_OBJECT_FLAG_STRUCT(bit_, symbol_, label_)			\
 			uint16_t symbol_ : 1;
-RSC_OBJECT_FLAG(RSC_OBJECT_FLAG_STRUCT)
+GEM_OBJECT_FLAG(RSC_OBJECT_FLAG_STRUCT)
 		} BE_STORAGE PACKED;
 		uint16_t mask;
 	} BE_STORAGE PACKED;

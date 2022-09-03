@@ -461,7 +461,7 @@ static void print_rsc_object_flags(
 #define RSC_OBJECT_FLAG_PRINT(bit_, symbol_, label_)			\
 	if (flags.symbol_)						\
 		printf(" %s", #label_);
-RSC_OBJECT_FLAG(RSC_OBJECT_FLAG_PRINT)
+GEM_OBJECT_FLAG(RSC_OBJECT_FLAG_PRINT)
 
 	if (flags.undefined)
 		printf(" UNDEFINED_0x%x", flags.undefined);

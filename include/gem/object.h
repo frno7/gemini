@@ -22,4 +22,19 @@
 	t(32, title,    TITLE,    string)				\
 	t(33, cicon,    CICON,    ciconblk)
 
+/* Reverse order for proper BE_STORAGE structure bit field order. */
+#define GEM_OBJECT_FLAG(f)						\
+	f(11, submenu,    SUBMENU)					\
+	f(10, fl3dact,    FL3DACT)					\
+	f( 9, fl3dind,    FL3DIND)					\
+	f( 8, indirect,   INDIRECT)					\
+	f( 7, hidetree,   HIDETREE)					\
+	f( 6, touchexit,  TOUCHEXIT)					\
+	f( 5, lastob,     LASTOB)					\
+	f( 4, rbutton,    RBUTTON)					\
+	f( 3, editable,   EDITABLE)					\
+	f( 2, exit,       EXIT)						\
+	f( 1, default_,   DEFAULT)					\
+	f( 0, selectable, SELECTABLE)
+
 #endif /* _GEM_OBJECT_H */
