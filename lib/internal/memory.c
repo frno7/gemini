@@ -36,6 +36,16 @@ void *xrealloc(void *ptr, size_t size)
 	return p;
 }
 
+void *memdup(const void *ptr, size_t size)
+{
+	void *p = malloc(size);
+
+	if (p)
+		memcpy(p, ptr, size);
+
+	return p;
+}
+
 void *xmemdup(const void *ptr, size_t size)
 {
 	void *p = xmalloc(size);
