@@ -221,11 +221,7 @@ RSC_HEADER_FIELD(RSC_HEADER_PRINT)
 
 static ssize_t rsc_string_indexed(size_t offset, const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-
-	BUG_ON(!h);
-
-	for (ssize_t i = 0; i < h->rsh_nstring; i++)
+	for (ssize_t i = 0; i < rsc->header->rsh_nstring; i++)
 		if (rsc_string_offset_at_index(i, rsc) == offset)
 			return i;
 
@@ -295,11 +291,7 @@ static void print_rsc_iconblk(const struct rsc_iconblk *iconblk,
 
 static ssize_t rsc_bitblk_indexed(size_t offset, const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-
-	BUG_ON(!h);
-
-	for (ssize_t i = 0; i < h->rsh_nimages; i++)
+	for (ssize_t i = 0; i < rsc->header->rsh_nimages; i++)
 		if (rsc_frimg_offset_at_index(i, rsc) == offset)
 			return i;
 
@@ -601,11 +593,7 @@ static void print_rsc_tree(const size_t i, const struct rsc *rsc)
 
 static void print_rsc_trees(const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-
-	BUG_ON(!h);
-
-	for (size_t i = 0; i < h->rsh_ntree; i++)
+	for (size_t i = 0; i < rsc->header->rsh_ntree; i++)
 		print_rsc_tree(i, rsc);
 }
 
@@ -623,7 +611,7 @@ static void print_rsc_info(const struct rsc *rsc)
 	rsc_map_for_each_region (region, map)				\
 		if (region.entry.type == rsc_map_entry_type_ ## type_ &&\
 		    !region.entry.reserved) {				\
-			const uint8_t *b = rsc->data;			\
+			const uint8_t *b = (const uint8_t *)rsc->header;\
 			const void *v = &b[region.offset];		\
 			print_rsc_ ## type_(				\
 				(const struct rsc_ ## type_ *)v,	\
@@ -654,7 +642,7 @@ static void print_rsc_map_region(
 
 	if (region->entry.type == rsc_map_entry_type_unused ||
 	    region->entry.reserved) {
-		const uint8_t *b = rsc->data;
+		const uint8_t *b = (const uint8_t *)rsc->header;
 
 		pr_mem(stdout, &b[region->offset], region->size);
 	}
@@ -724,11 +712,6 @@ static bool draw_rsc_pixel(uint16_t x, uint16_t y,
 
 static bool draw_rsc(const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-
-	if (!h)
-		return false;
-
 	struct aes aes_ = { };
 	struct draw_rsc_arg arg = {
 		.aes_id = aes_appl_init(&aes_),
@@ -742,7 +725,7 @@ static bool draw_rsc(const struct rsc *rsc)
 	if (!aes_id_valid(arg.aes_id))
 		pr_fatal_error("%s: Failed to open AES\n", option.input);
 
-	if (!tiff_image_file(option.output, h->rsh_ntree, &f, &arg))
+	if (!tiff_image_file(option.output, rsc->header->rsh_ntree, &f, &arg))
 		pr_fatal_errno(option.output);
 
 	aes_appl_exit(arg.aes_id);
@@ -769,7 +752,10 @@ int main(int argc, char *argv[])
 	if (!file_valid(&f))
 		pr_fatal_errno(option.input);
 
-	const struct rsc rsc = { .size = f.size, .data = f.data };
+	const struct rsc rsc = {
+		.size = f.size,
+		.header = (const struct rsc_header *)f.data
+	};
 
 	if (option.identify) {
 		const bool valid = rsc_valid_structure(&rsc);

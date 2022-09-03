@@ -79,16 +79,15 @@ static bool __attribute__((format(printf, 3, 4))) rsc_error(void *arg,
 size_t rsc_string_offset_at_index(const size_t i, const struct rsc *rsc)
 {
 	const size_t unextended_size = rsc_unextended_size(rsc);
-	const struct rsc_header *h = rsc_header(rsc);
 
-	if (!h || h->rsh_frstr + sizeof(uint32_t[i + 1]) > unextended_size)
+	if (rsc->header->rsh_frstr + sizeof(uint32_t[i + 1]) > unextended_size)
 		return 0;
 
-	const uint8_t *b = rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 	const struct rsc_string_table {
 		uint32_t offset;
 	} BE_STORAGE PACKED *a =
-		(const struct rsc_string_table *)&b[h->rsh_frstr];
+		(const struct rsc_string_table *)&b[rsc->header->rsh_frstr];
 
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
@@ -100,7 +99,7 @@ const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc)
 	if (!offset || offset >= unextended_size)
 		return NULL;
 
-	const char *c = rsc->data;
+	const char *c = (const char *)rsc->header;
 
 	for (size_t i = 0; offset + i < unextended_size; i++)
 		if (!c[offset + i])
@@ -121,7 +120,7 @@ const struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
 	    offset + sizeof(struct rsc_tedinfo) > rsc_unextended_size(rsc))
 		return (const struct rsc_tedinfo *)NULL;
 
-	const uint8_t *b = (const uint8_t *)rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	return (const struct rsc_tedinfo *)&b[offset];
 }
@@ -133,7 +132,7 @@ const struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
 	    offset + sizeof(struct rsc_bitblk) > rsc_unextended_size(rsc))
 		return (const struct rsc_bitblk *)NULL;
 
-	const uint8_t *b = (const uint8_t *)rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	return (const struct rsc_bitblk *)&b[offset];
 }
@@ -141,17 +140,16 @@ const struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
 size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc)
 {
 	const size_t unextended_size = rsc_unextended_size(rsc);
-	const struct rsc_header *h = rsc_header(rsc);
 
-	if (!h || i >= h->rsh_nimages ||
-	    h->rsh_frimg + sizeof(uint32_t[i + 1]) > unextended_size)
+	if (i >= rsc->header->rsh_nimages ||
+	    rsc->header->rsh_frimg + sizeof(uint32_t[i + 1]) > unextended_size)
 		return 0;
 
-	const uint8_t *b = (const uint8_t *)rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 	const struct rsc_frimg_table {
 		uint32_t offset;
 	} BE_STORAGE PACKED *a =
-		(const struct rsc_frimg_table *) &b[h->rsh_frimg];
+		(const struct rsc_frimg_table *)&b[rsc->header->rsh_frimg];
 
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
@@ -167,7 +165,7 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 {
 	const size_t data_offset = iconblk->ib_pdata + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
 	const size_t mask_offset = iconblk->ib_pmask + (x / 8) + (iconblk->ib_icon.r.w / 8) * y;
-	const uint8_t *b = rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (x < 0 || y < 0 ||
 	    x >= iconblk->ib_icon.r.w ||
@@ -186,7 +184,7 @@ bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc)
 {
 	const size_t offset = bitblk->bi_pdata + (x / 8) + bitblk->bi_wb * y;
-	const uint8_t *b = rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (x < 0 || y < 0 ||
 	    x >= bitblk->bi_wb * 8 ||
@@ -203,7 +201,7 @@ const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
 	if (offset + sizeof(struct rsc_object) > rsc_unextended_size(rsc))
 		return (const struct rsc_iconblk *)NULL;
 
-	const uint8_t *b = (const uint8_t *)rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	return (const struct rsc_iconblk *)&b[offset];
 }
@@ -211,17 +209,16 @@ const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
 size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc)
 {
 	const size_t unextended_size = rsc_unextended_size(rsc);
-	const struct rsc_header *h = rsc_header(rsc);
 
-	if (!h || i >= h->rsh_nib ||
-	    h->rsh_iconblk + sizeof(uint32_t[i + 1]) > unextended_size)
+	if (i >= rsc->header->rsh_nib ||
+	    rsc->header->rsh_iconblk + sizeof(uint32_t[i + 1]) > unextended_size)
 		return 0;
 
-	const uint8_t *b = (const uint8_t *)rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 	const struct rsc_iconblk_table {
 		uint32_t offset;
 	} BE_STORAGE PACKED *a =
-		(const struct rsc_iconblk_table *) &b[h->rsh_iconblk];
+		(const struct rsc_iconblk_table *)&b[rsc->header->rsh_iconblk];
 
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
@@ -232,18 +229,11 @@ const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
 	return rsc_iconblk_at_offset(rsc_iconblk_offset_at_index(i, rsc), rsc);
 }
 
-const struct rsc_header *rsc_header(const struct rsc *rsc)
-{
-	return rsc->size >= sizeof(struct rsc_header) ?
-		(const struct rsc_header *)rsc->data : NULL;
-}
-
 size_t rsc_unextended_size(const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-	const size_t size = h ? min_t(size_t, rsc->size, h->rsh_rssize) : 0;
+	const size_t size = min_t(size_t, rsc->size, rsc->header->rsh_rssize);
 
-	return size < sizeof(*h) ? 0 : size;
+	return size < sizeof(*rsc->header) ? 0 : size;
 }
 
 const struct rsc_object *rsc_tree_object_at_offset(
@@ -252,7 +242,7 @@ const struct rsc_object *rsc_tree_object_at_offset(
 	if (!offset)
 		return (const struct rsc_object *)NULL;
 
-	const uint8_t *b = rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (rsc_unextended_size(rsc) < offset + sizeof(struct rsc_object))
 		return (const struct rsc_object *)NULL;
@@ -262,19 +252,18 @@ const struct rsc_object *rsc_tree_object_at_offset(
 
 size_t rsc_tree_offset_at_index(const size_t i, const struct rsc *rsc)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-
-	if (!h || h->rsh_trindex < sizeof(*h))
+	if (rsc->header->rsh_trindex < sizeof(*rsc->header))
 		return 0;
 
-	if (h->rsh_trindex + sizeof(uint32_t[i + 1]) > rsc_unextended_size(rsc))
+	if (rsc->header->rsh_trindex + sizeof(uint32_t[i + 1]) >
+			rsc_unextended_size(rsc))
 		return 0;
 
-	const uint8_t *b = rsc->data;
+	const uint8_t *b = (const uint8_t *)rsc->header;
 	const struct rsc_tree_table {
 		uint32_t offset;
 	} BE_STORAGE PACKED *table =
-		(const struct rsc_tree_table *)&b[h->rsh_trindex];
+		(const struct rsc_tree_table *)&b[rsc->header->rsh_trindex];
 
 	if (rsc_unextended_size(rsc) < table[i].offset + sizeof(struct rsc_object))
 		return 0;
@@ -324,15 +313,19 @@ int16_t rsc_tree_traverse(int16_t ob, const struct rsc_object *tree)
 	}
 }
 
+static bool rsc_valid_header(const struct rsc *rsc)
+{
+	return rsc->size >= sizeof(*rsc->header);
+}
+
 static bool rsc_valid_header_vrsn(const struct rsc *rsc,
 	const struct rsc_diagnostic *diagnostic, void *arg)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-	const bool valid = h && h->rsh_vrsn <= 0x7;
+	const bool valid = rsc->header->rsh_vrsn <= 0x7;
 
-	if (!valid && h)
+	if (!valid)
 		return rsc_error(arg, diagnostic,
-			"Invalid header version %x", h->rsh_vrsn);
+			"Invalid header version %x", rsc->header->rsh_vrsn);
 	else if (!valid)
 		return rsc_error(arg, diagnostic, "Invalid header version");
 
@@ -342,13 +335,12 @@ static bool rsc_valid_header_vrsn(const struct rsc *rsc,
 static bool rsc_valid_header_rssize(const struct rsc *rsc,
 	const struct rsc_diagnostic *diagnostic, void *arg)
 {
-	const struct rsc_header *h = rsc_header(rsc);
-	const bool valid =
-		h && h->rsh_rssize >= sizeof(*h) && h->rsh_rssize <= rsc->size;
+	const bool valid = rsc->header->rsh_rssize >= sizeof(*rsc->header) &&
+			   rsc->header->rsh_rssize <= rsc->size;
 
-	if (!valid && h)
+	if (!valid)
 		return rsc_error(arg, diagnostic,
-			"Invalid header size %u", h->rsh_rssize);
+			"Invalid header size %u", rsc->header->rsh_rssize);
 	else if (!valid)
 		return rsc_error(arg, diagnostic, "Invalid header size");
 
@@ -452,18 +444,15 @@ static bool rsc_map_mark_type_reserved(const enum rsc_map_entry_type type,
 
 static bool rsc_map_header(struct rsc_map_diagnostic *map_diagnostic)
 {
-	if (!rsc_header(map_diagnostic->rsc))
-		return false;
-
 	return rsc_map_mark_type(rsc_map_entry_type_header,
 		0, sizeof(struct rsc_header), map_diagnostic->map);
 }
 
 static bool rsc_map_frstr(struct rsc_map_diagnostic *map_diagnostic)
 {
-	const struct rsc_header *h = rsc_header(map_diagnostic->rsc);
+	const struct rsc_header *h = map_diagnostic->rsc->header;
 
-	if (!h || !rsc_map_mark_type(rsc_map_entry_type_frstr, h->rsh_frstr,
+	if (!rsc_map_mark_type(rsc_map_entry_type_frstr, h->rsh_frstr,
 			sizeof(uint32_t[h->rsh_nstring]), map_diagnostic->map))
 		return false;
 
@@ -504,9 +493,9 @@ static bool rsc_map_bitblk(const size_t bitblk_offset,
 
 static bool rsc_map_frimg(struct rsc_map_diagnostic *map_diagnostic)
 {
-	const struct rsc_header *h = rsc_header(map_diagnostic->rsc);
+	const struct rsc_header *h = map_diagnostic->rsc->header;
 
-	if (!h || !rsc_map_mark_type(rsc_map_entry_type_frimg, h->rsh_frimg,
+	if (!rsc_map_mark_type(rsc_map_entry_type_frimg, h->rsh_frimg,
 			sizeof(uint32_t[h->rsh_nimages]), map_diagnostic->map))
 		return false;
 
@@ -715,10 +704,7 @@ static bool rsc_map_tree_objects(const struct rsc_object *tree,
 
 static bool rsc_map_tree(struct rsc_map_diagnostic *map_diagnostic)
 {
-	const struct rsc_header *h = rsc_header(map_diagnostic->rsc);
-
-	if (!h)
-		return false;
+	const struct rsc_header *h = map_diagnostic->rsc->header;
 
 	for (size_t i = 0; i < h->rsh_ntree; i++) {
 		const struct rsc_object *tree =
@@ -780,10 +766,7 @@ static bool rsc_map_alignment(struct rsc_map_diagnostic *map_diagnostic)
 
 static bool rsc_map_reservations(struct rsc_map_diagnostic *map_diagnostic)
 {
-	const struct rsc_header *h = rsc_header(map_diagnostic->rsc);
-
-	if (!h)
-		return false;
+	const struct rsc_header *h = map_diagnostic->rsc->header;
 
 	const struct {
 		enum rsc_map_entry_type type;
@@ -958,7 +941,7 @@ bool rsc_valid_structure_diagnostic(const struct rsc *rsc,
 	BUILD_BUG_ON(sizeof(struct rsc_iconblk_area)      !=  8);
 	BUILD_BUG_ON(sizeof(struct rsc_iconblk)           != 34);
 
-	if (!rsc_header(rsc))
+	if (!rsc_valid_header(rsc))
 		return rsc_error(arg, diagnostic, "Malformed header");
 
 	if (!rsc_valid_header_vrsn(rsc, diagnostic, arg))

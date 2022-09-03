@@ -15,7 +15,7 @@
 
 struct rsc {
 	size_t size;
-	const void *data;
+	const struct rsc_header *header;
 };
 
 #define RSC_HEADER_FIELD(f)						\
@@ -312,8 +312,6 @@ size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc);
 
 const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
 	const struct rsc *rsc);
-
-const struct rsc_header *rsc_header(const struct rsc *rsc);
 
 const struct rsc_object *rsc_tree_object_at_offset(
 	const size_t offset, const struct rsc *rsc);
