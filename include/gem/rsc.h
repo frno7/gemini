@@ -234,6 +234,8 @@ size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc);
 const struct rsc_bitblk *rsc_frimg_at_index(const size_t index,
 	const struct rsc *rsc);
 
+size_t rsc_iconblk_bitmap_size(const struct rsc_iconblk *iconblk);
+
 struct rsc_iconblk_pixel {
 	uint8_t data : 1;
 	uint8_t mask : 1;

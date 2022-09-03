@@ -160,6 +160,12 @@ const struct rsc_bitblk *rsc_frimg_at_index(const size_t i,
 	return rsc_bitblk_at_offset(rsc_frimg_offset_at_index(i, rsc), rsc);
 }
 
+size_t rsc_iconblk_bitmap_size(const struct rsc_iconblk *iconblk)
+{
+	return (size_t)(iconblk->ib_icon.r.w / 8) *
+	       (size_t)iconblk->ib_icon.r.h;
+}
+
 struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	const struct rsc_iconblk *iconblk, const struct rsc *rsc)
 {
