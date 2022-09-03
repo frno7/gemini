@@ -427,9 +427,9 @@ static void print_rsc_object_link(
 static const char *rsc_object_g_type_label(const struct rsc_object_type type)
 {
 	switch (type.g) {
-#define RSC_OBJECT_G_TYPE_PRINT(n_, symbol_, label_, form_)		\
+#define RSC_OBJECT_G_TYPE_PRINT(n_, symbol_, label_, spec_)		\
 	case n_: return "G_" #label_;
-RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_PRINT)
+GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_PRINT)
 	default: return "";
 	}
 }
@@ -551,9 +551,9 @@ static void print_rsc_object_spec(
 	printf(" attr spec");
 
 	switch (tree[ob].attr.type.g) {
-#define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, form_)		\
-	case n_: return print_rsc_object_spec_ ## form_(spec, rsc);
-RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
+#define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, spec_)		\
+	case n_: return print_rsc_object_spec_ ## spec_(spec, rsc);
+GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
 	default: printf(" UNDEFINED_0x%x\n", spec.undefined);
 	}
 }

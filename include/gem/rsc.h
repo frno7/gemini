@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "color.h"
+#include "object.h"
 
 #include "internal/struct.h"
 
@@ -43,26 +44,10 @@ struct rsc_header {
 RSC_HEADER_FIELD(RSC_HEADER_STRUCTURE)
 } BE_STORAGE PACKED;
 
-#define RSC_OBJECT_G_TYPE(t)						\
-	t(20, box,      BOX,      box)					\
-	t(21, text,     TEXT,     tedinfo)				\
-	t(22, boxtext,  BOXTEXT,  tedinfo)				\
-	t(23, image,    IMAGE,    bitblk)				\
-	t(24, progdef,  PROGDEF,  applblk)				\
-	t(25, ibox,     IBOX,     box)					\
-	t(26, button,   BUTTON,   string)				\
-	t(27, boxchar,  BOXCHAR,  box)					\
-	t(28, string,   STRING,   string)				\
-	t(29, ftext,    FTEXT,    tedinfo)				\
-	t(30, fboxtext, FBOXTEXT, tedinfo)				\
-	t(31, icon,     ICON,     iconblk)				\
-	t(32, title,    TITLE,    string)				\
-	t(33, cicon,    CICON,    ciconblk)
-
 enum {
-#define RSC_OBJECT_G_TYPE_ENUM(n_, symbol_, label_, form_)		\
+#define RSC_OBJECT_G_TYPE_ENUM(n_, symbol_, label_, spec_)		\
 	RSC_G_ ## label_ = n_,
-RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
+GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
 };
 
 /* Reverse order for proper BE_STORAGE structure bit field order. */

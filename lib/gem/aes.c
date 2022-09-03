@@ -558,10 +558,10 @@ int aes_objc_pixel(aes_id_t aes_id, const int x, const int y,
 		return border.color;
 
 	switch (tree[ob].attr.type.g) {
-#define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, form_)		\
+#define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, spec_)		\
 	case n_: return aes_g_ ## symbol_ ## _pixel(			\
 		aes_id, x, y, area, ob, tree, rsc_);
-RSC_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
+GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
 	}
 
 	return -1;
