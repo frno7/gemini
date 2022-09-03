@@ -606,32 +606,32 @@ static bool rsc_map_object(const int16_t ob, const struct rsc_object *tree,
 		return false;
 
 	switch (tree[ob].attr.type.g) {
-	case RSC_G_BOX:
-	case RSC_G_IBOX:
-	case RSC_G_BOXCHAR:
+	case GEM_G_BOX:
+	case GEM_G_IBOX:
+	case GEM_G_BOXCHAR:
 		break;
-	case RSC_G_TEXT:
-	case RSC_G_BOXTEXT:
-	case RSC_G_FTEXT:
-	case RSC_G_FBOXTEXT:
+	case GEM_G_TEXT:
+	case GEM_G_BOXTEXT:
+	case GEM_G_FTEXT:
+	case GEM_G_FBOXTEXT:
 		if (!rsc_map_tedinfo(tree[ob].attr.spec.tedinfo, map, rsc))
 			return false;
 		break;
-	case RSC_G_IMAGE:
+	case GEM_G_IMAGE:
 		if (!rsc_map_bitblk(tree[ob].attr.spec.bitblk, map, rsc))
 			return false;
 		break;
-	case RSC_G_BUTTON:
-	case RSC_G_STRING:
-	case RSC_G_TITLE:
+	case GEM_G_BUTTON:
+	case GEM_G_STRING:
+	case GEM_G_TITLE:
 		if (!rsc_map_string(tree[ob].attr.spec.string, map, rsc))
 			return false;
 		break;
-	case RSC_G_ICON:
+	case GEM_G_ICON:
 		if (!rsc_map_iconblk(tree[ob].attr.spec.iconblk, map, rsc))
 			return false;
 		break;
-	case RSC_G_PROGDEF:
+	case GEM_G_PROGDEF:
 		if (!rsc_map_applblk(tree[ob].attr.spec.applblk, map, rsc))
 			return false;
 		break;

@@ -44,12 +44,6 @@ struct rsc_header {
 RSC_HEADER_FIELD(RSC_HEADER_STRUCTURE)
 } BE_STORAGE PACKED;
 
-enum {
-#define RSC_OBJECT_G_TYPE_ENUM(n_, symbol_, label_, spec_)		\
-	RSC_G_ ## label_ = n_,
-GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_ENUM)
-};
-
 struct rsc_object_color {
 	uint16_t border : 4;
 	uint16_t text : 4;

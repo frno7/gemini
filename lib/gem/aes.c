@@ -82,13 +82,13 @@ static struct aes_object_border aes_objc_border(const int ob,
 	const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	switch (tree[ob].attr.type.g) {
-	case RSC_G_BOX:
-	case RSC_G_BOXCHAR:
+	case GEM_G_BOX:
+	case GEM_G_BOXCHAR:
 		return (struct aes_object_border) {
 			.color = tree[ob].attr.spec.box.color.border,
 			.thickness = tree[ob].attr.spec.box.thickness
 		};
-	case RSC_G_BUTTON:
+	case GEM_G_BUTTON:
 		return (struct aes_object_border) {
 			.color = 1,
 			.thickness = (tree[ob].attr.flags.exit     ? -1 : 0) +

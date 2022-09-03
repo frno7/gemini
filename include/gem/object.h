@@ -22,6 +22,12 @@
 	t(32, title,    TITLE,    string)				\
 	t(33, cicon,    CICON,    ciconblk)
 
+enum {
+#define GEM_OBJECT_G_TYPE_ENUM(n_, symbol_, label_, spec_)		\
+	GEM_G_ ## label_ = n_,
+GEM_OBJECT_G_TYPE(GEM_OBJECT_G_TYPE_ENUM)
+};
+
 /* Reverse order for proper BE_STORAGE structure bit field order. */
 #define GEM_OBJECT_FLAG(f)						\
 	f(11, submenu,    SUBMENU)					\
