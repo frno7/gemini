@@ -17,7 +17,7 @@
 struct storage_file {
 	const char *path;
 	size_t size;
-	const void *data;
+	void *data;
 };
 
 const struct storage_file *storage_files(void);

@@ -24,7 +24,7 @@ function define_data()
 	local i=0
 	while [ $# -gt 0 ]
 	do
-		echo "static const unsigned char data$i[] = {"
+		echo "static unsigned char data$i[] = {"
 		xxd -i <"$1"
 		echo "  ,0"
 		echo "};"
