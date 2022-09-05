@@ -39,14 +39,14 @@ size_t rsc_string_offset_at_index(const size_t i, const struct rsc *rsc)
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
 
-const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc)
+char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc)
 {
 	const size_t unextended_size = rsc_unextended_size(rsc);
 
 	if (!offset || offset >= unextended_size)
 		return NULL;
 
-	const char *c = (const char *)rsc->header;
+	char *c = (char *)rsc->header;
 
 	for (size_t i = 0; offset + i < unextended_size; i++)
 		if (!c[offset + i])
@@ -55,33 +55,33 @@ const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc)
 	return NULL;
 }
 
-const char *rsc_string_at_index(const size_t i, const struct rsc *rsc)
+char *rsc_string_at_index(const size_t i, const struct rsc *rsc)
 {
 	return rsc_string_at_offset(rsc_string_offset_at_index(i, rsc), rsc);
 }
 
-const struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
+struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
 	const struct rsc *rsc)
 {
 	if (!offset ||
 	    offset + sizeof(struct rsc_tedinfo) > rsc_unextended_size(rsc))
-		return (const struct rsc_tedinfo *)NULL;
+		return (struct rsc_tedinfo *)NULL;
 
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
-	return (const struct rsc_tedinfo *)&b[offset];
+	return (struct rsc_tedinfo *)&b[offset];
 }
 
-const struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
+struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
 	const struct rsc *rsc)
 {
 	if (!offset ||
 	    offset + sizeof(struct rsc_bitblk) > rsc_unextended_size(rsc))
-		return (const struct rsc_bitblk *)NULL;
+		return (struct rsc_bitblk *)NULL;
 
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
-	return (const struct rsc_bitblk *)&b[offset];
+	return (struct rsc_bitblk *)&b[offset];
 }
 
 size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc)
@@ -101,8 +101,7 @@ size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc)
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
 
-const struct rsc_bitblk *rsc_frimg_at_index(const size_t i,
-	const struct rsc *rsc)
+struct rsc_bitblk *rsc_frimg_at_index(const size_t i, const struct rsc *rsc)
 {
 	return rsc_bitblk_at_offset(rsc_frimg_offset_at_index(i, rsc), rsc);
 }
@@ -133,12 +132,12 @@ struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	};
 }
 
-const uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc)
+uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc)
 {
 	if (!offset || offset > rsc_unextended_size(rsc))
 		return NULL;
 
-	const uint8_t *b = (const uint8_t *)rsc->header;
+	uint8_t *b = (uint8_t *)rsc->header;
 
 	return &b[offset];
 }
@@ -163,15 +162,15 @@ bool rsc_bitblk_pixel(int x, int y,
 	return (b[offset] & (0x80 >> (x % 8))) ? true : false;
 }
 
-const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
+struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
 	const struct rsc *rsc)
 {
 	if (offset + sizeof(struct rsc_object) > rsc_unextended_size(rsc))
-		return (const struct rsc_iconblk *)NULL;
+		return (struct rsc_iconblk *)NULL;
 
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
-	return (const struct rsc_iconblk *)&b[offset];
+	return (struct rsc_iconblk *)&b[offset];
 }
 
 size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc)
@@ -191,8 +190,7 @@ size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc)
 	return a[i].offset < unextended_size ? a[i].offset : 0;
 }
 
-const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
-	const struct rsc *rsc)
+struct rsc_iconblk *rsc_iconblk_at_index(const size_t i, const struct rsc *rsc)
 {
 	return rsc_iconblk_at_offset(rsc_iconblk_offset_at_index(i, rsc), rsc);
 }
@@ -204,18 +202,18 @@ size_t rsc_unextended_size(const struct rsc *rsc)
 	return size < sizeof(*rsc->header) ? 0 : size;
 }
 
-const struct rsc_object *rsc_tree_object_at_offset(
+struct rsc_object *rsc_tree_object_at_offset(
 	const size_t offset, const struct rsc *rsc)
 {
 	if (!offset)
-		return (const struct rsc_object *)NULL;
+		return (struct rsc_object *)NULL;
 
 	const uint8_t *b = (const uint8_t *)rsc->header;
 
 	if (rsc_unextended_size(rsc) < offset + sizeof(struct rsc_object))
-		return (const struct rsc_object *)NULL;
+		return (struct rsc_object *)NULL;
 
-	return (const struct rsc_object *)&b[offset];
+	return (struct rsc_object *)&b[offset];
 }
 
 size_t rsc_tree_offset_at_index(const size_t i, const struct rsc *rsc)
@@ -239,7 +237,7 @@ size_t rsc_tree_offset_at_index(const size_t i, const struct rsc *rsc)
 	return table[i].offset;
 }
 
-const struct rsc_object *rsc_tree_at_index(const size_t i, const struct rsc *rsc)
+struct rsc_object *rsc_tree_at_index(const size_t i, const struct rsc *rsc)
 {
 	return rsc_tree_object_at_offset(rsc_tree_offset_at_index(i, rsc), rsc);
 }

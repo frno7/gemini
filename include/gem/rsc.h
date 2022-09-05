@@ -219,19 +219,19 @@ struct rsc_applblk {
 
 size_t rsc_string_offset_at_index(const size_t i, const struct rsc *rsc);
 
-const char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc);
+char *rsc_string_at_offset(const size_t offset, const struct rsc *rsc);
 
-const char *rsc_string_at_index(const size_t index, const struct rsc *rsc);
+char *rsc_string_at_index(const size_t i, const struct rsc *rsc);
 
-const struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
+struct rsc_tedinfo *rsc_tedinfo_at_offset(const size_t offset,
 	const struct rsc *rsc);
 
-const struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
+struct rsc_bitblk *rsc_bitblk_at_offset(const size_t offset,
 	const struct rsc *rsc);
 
 size_t rsc_frimg_offset_at_index(const size_t i, const struct rsc *rsc);
 
-const struct rsc_bitblk *rsc_frimg_at_index(const size_t index,
+struct rsc_bitblk *rsc_frimg_at_index(const size_t i,
 	const struct rsc *rsc);
 
 size_t rsc_iconblk_bitmap_size(const struct rsc_iconblk *iconblk);
@@ -244,28 +244,26 @@ struct rsc_iconblk_pixel {
 struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	const struct rsc_iconblk *iconblk, const struct rsc *rsc);
 
-const uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc);
+uint8_t *rsc_bitmap_at_offset(const size_t offset, const struct rsc *rsc);
 
 size_t rsc_bitblk_bitmap_size(const struct rsc_bitblk *bitblk);
 
 bool rsc_bitblk_pixel(int x, int y,
 	const struct rsc_bitblk *bitblk, const struct rsc *rsc);
 
-const struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
+struct rsc_iconblk *rsc_iconblk_at_offset(const size_t offset,
 	const struct rsc *rsc);
 
 size_t rsc_iconblk_offset_at_index(const size_t i, const struct rsc *rsc);
 
-const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
-	const struct rsc *rsc);
+struct rsc_iconblk *rsc_iconblk_at_index(const size_t i, const struct rsc *rsc);
 
-const struct rsc_object *rsc_tree_object_at_offset(
+struct rsc_object *rsc_tree_object_at_offset(
 	const size_t offset, const struct rsc *rsc);
 
 size_t rsc_tree_offset_at_index(const size_t i, const struct rsc *rsc);
 
-const struct rsc_object *rsc_tree_at_index(
-	const size_t index, const struct rsc *rsc);
+struct rsc_object *rsc_tree_at_index(const size_t i, const struct rsc *rsc);
 
 size_t rsc_unextended_size(const struct rsc *rsc);
 
