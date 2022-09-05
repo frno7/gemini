@@ -124,13 +124,13 @@ struct rsc_object {
 		int16_t head;
 		int16_t tail;
 	} BE_STORAGE PACKED link;
-	struct rsc_object_attr {
+	struct rsc_object_shape {
 		struct rsc_object_type type;
 		struct rsc_object_flags flags;
 		struct rsc_object_state state;
 		struct rsc_object_spec spec;
 		struct rsc_object_area area;
-	} BE_STORAGE PACKED attr;
+	} BE_STORAGE PACKED shape;
 } BE_STORAGE PACKED;
 
 enum {
