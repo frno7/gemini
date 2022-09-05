@@ -4,10 +4,10 @@
 #include <string.h>
 
 #include <gem/aes.h>
+#include <gem/aes-area.h>
 #include <gem/vdi_.h>
 
 #include "internal/assert.h"
-#include "internal/compare.h"
 
 aes_id_t aes_appl_init(struct aes *aes_)
 {
@@ -109,72 +109,6 @@ struct fnt *aes_fnt_large(aes_id_t aes_id)
 struct fnt *aes_fnt_small(aes_id_t aes_id)
 {
 	return aes_id.aes_->vdi_id.vdi->font.small;
-}
-
-typedef struct aes_area (*aes_area_justify_rectangle_f)(
-	const struct aes_rectangle rectangle,
-	const struct aes_area area);
-
-static struct aes_area aes_area_justify_rectangle_top_center(
-	const struct aes_rectangle rectangle,
-	const struct aes_area area)
-{
-	return (struct aes_area) {
-		.p = {
-			.x = area.p.x + (area.r.w - rectangle.w) / 2,
-			.y = area.p.y
-		},
-		.r = rectangle
-	};
-}
-
-static struct aes_area aes_area_justify_rectangle_center_left(
-	const struct aes_rectangle rectangle,
-	const struct aes_area area)
-{
-	return (struct aes_area) {
-		.p = {
-			.x = area.p.x,
-			.y = area.p.y + (area.r.h - rectangle.h) / 2
-		},
-		.r = rectangle
-	};
-}
-
-static struct aes_area aes_area_justify_rectangle_center(
-	const struct aes_rectangle rectangle,
-	const struct aes_area area)
-{
-	return (struct aes_area) {
-		.p = {
-			.x = area.p.x + (area.r.w - rectangle.w) / 2,
-			.y = area.p.y + (area.r.h - rectangle.h) / 2
-		},
-		.r = rectangle
-	};
-}
-
-static struct aes_area aes_area_justify_rectangle_center_right(
-	const struct aes_rectangle rectangle,
-	const struct aes_area area)
-{
-	return (struct aes_area) {
-		.p = {
-			.x = area.p.x + (area.r.w - rectangle.w),
-			.y = area.p.y + (area.r.h - rectangle.h) / 2
-		},
-		.r = rectangle
-	};
-}
-
-static struct aes_area aes_area_shrink(
-	const struct aes_area area, const int d)
-{
-	return aes_area_justify_rectangle_center(
-		(struct aes_rectangle) {
-			.w = max(0, area.r.w - 2 * d),
-			.h = max(0, area.r.h - 2 * d)
-		}, area);
 }
 
 static struct aes_rectangle aes_grid(aes_id_t aes_id)
