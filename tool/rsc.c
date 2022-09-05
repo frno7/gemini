@@ -8,6 +8,7 @@
 
 #include <gem/aes.h>
 #include <gem/rsc.h>
+#include <gem/rsc-map.h>
 
 #include "internal/assert.h"
 #include "internal/build-assert.h"

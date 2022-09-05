@@ -6,6 +6,7 @@ GEM_SRC =								\
 	lib/gem/aes.c							\
 	lib/gem/fnt.c							\
 	lib/gem/rsc.c							\
+	lib/gem/rsc-map.c						\
 	lib/gem/vdi.c
 
 GEMLIB_SRC = $(GEM_SRC) $(STORAGE_SRC)
