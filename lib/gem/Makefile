@@ -4,6 +4,7 @@ STORAGE_SRC = lib/gem/storage.c
 
 GEM_SRC =								\
 	lib/gem/aes.c							\
+	lib/gem/aes-rsc.c						\
 	lib/gem/fnt.c							\
 	lib/gem/rsc.c							\
 	lib/gem/rsc-map.c						\
