@@ -262,6 +262,8 @@ const struct rsc_iconblk *rsc_iconblk_at_index(const size_t i,
 const struct rsc_object *rsc_tree_object_at_offset(
 	const size_t offset, const struct rsc *rsc);
 
+size_t rsc_tree_offset_at_index(const size_t i, const struct rsc *rsc);
+
 const struct rsc_object *rsc_tree_at_index(
 	const size_t index, const struct rsc *rsc);
 
