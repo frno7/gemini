@@ -212,6 +212,11 @@ struct rsc_iconblk {
 RSC_ICONBLK_FIELD(RSC_ICONBLK_STRUCTURE)
 } BE_STORAGE PACKED;
 
+struct rsc_iconblk_pixel {
+	uint8_t data : 1;
+	uint8_t mask : 1;
+};
+
 struct rsc_applblk {
 	uint32_t ap_code;
 	uint32_t ap_parm;
@@ -235,11 +240,6 @@ struct rsc_bitblk *rsc_frimg_at_index(const size_t i,
 	const struct rsc *rsc);
 
 size_t rsc_iconblk_bitmap_size(const struct rsc_iconblk *iconblk);
-
-struct rsc_iconblk_pixel {
-	uint8_t data : 1;
-	uint8_t mask : 1;
-};
 
 struct rsc_iconblk_pixel rsc_iconblk_pixel(int x, int y,
 	const struct rsc_iconblk *iconblk, const struct rsc *rsc);
