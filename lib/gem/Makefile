@@ -23,8 +23,10 @@ GEMLIB = lib/gem/gemlib.a
 ALL_OBJ += $(GEMLIB_OBJ)
 OTHER_CLEAN += $(GEMLIB) $(STORAGE_SRC)
 
-$(STORAGE_SRC): $(STORAGE)
-	$(QUIET_GEN)script/storage -o $@ $^
+STORAGE_SCRIPT = script/storage
+
+$(STORAGE_SRC): $(STORAGE) $(STORAGE_SCRIPT)
+	$(QUIET_GEN)$(STORAGE_SCRIPT) -o $@ $(STORAGE)
 
 $(GEMLIB): $(GEMLIB_OBJ) $(UNICODE_OBJ) $(INTERNAL_OBJ) $(VERSION_OBJ)
 	$(QUIET_AR)$(AR) rcs $@ $^
