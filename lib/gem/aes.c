@@ -115,7 +115,7 @@ typedef struct aes_area (*aes_area_justify_rectangle_f)(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area);
 
-static struct aes_area justify_top_center(
+static struct aes_area aes_area_justify_rectangle_top_center(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area)
 {
@@ -128,7 +128,7 @@ static struct aes_area justify_top_center(
 	};
 }
 
-static struct aes_area justify_center_left(
+static struct aes_area aes_area_justify_rectangle_center_left(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area)
 {
@@ -141,7 +141,7 @@ static struct aes_area justify_center_left(
 	};
 }
 
-static struct aes_area justify_center_center(
+static struct aes_area aes_area_justify_rectangle_center(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area)
 {
@@ -154,7 +154,7 @@ static struct aes_area justify_center_center(
 	};
 }
 
-static struct aes_area justify_center_right(
+static struct aes_area aes_area_justify_rectangle_center_right(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area)
 {
@@ -170,7 +170,7 @@ static struct aes_area justify_center_right(
 static struct aes_area aes_area_shrink(
 	const struct aes_area area, const int d)
 {
-	return justify_center_center(
+	return aes_area_justify_rectangle_center(
 		(struct aes_rectangle) {
 			.w = max(0, area.r.w - 2 * d),
 			.h = max(0, area.r.h - 2 * d)
@@ -323,9 +323,11 @@ static bool aes_string_pixel(aes_id_t aes_id,
 static aes_area_justify_rectangle_f rsc_tedinfo_justification(
 	const struct rsc_tedinfo *t)
 {
-	return t->te_just == rsc_tedinfo_left  ? justify_center_left  :
-	       t->te_just == rsc_tedinfo_right ? justify_center_right :
-						 justify_center_center;
+	return t->te_just == rsc_tedinfo_left  ?
+				aes_area_justify_rectangle_center_left  :
+	       t->te_just == rsc_tedinfo_right ?
+				aes_area_justify_rectangle_center_right :
+				aes_area_justify_rectangle_center;
 }
 
 static int aes_g_box_pixel(aes_id_t aes_id,
@@ -354,7 +356,8 @@ static int aes_g_boxchar_pixel(aes_id_t aes_id,
 	const char s[] = { tree[ob].attr.spec.box.c, '\0' };
 
 	if (aes_string_pixel(aes_id, p, area, s,
-			justify_center_center, aes_char_pixel, aes_fnt_large))
+			aes_area_justify_rectangle_center,
+				aes_char_pixel, aes_fnt_large))
 		return !tree[ob].attr.state.selected;
 
 	return aes_g_box_pixel(aes_id, p, area, ob, tree, rsc_);
@@ -392,7 +395,8 @@ static int aes_g_string_pixel(aes_id_t aes_id,
 {
 	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
-		justify_center_left, tree[ob].attr.state.disabled ?
+		aes_area_justify_rectangle_center_left,
+		tree[ob].attr.state.disabled ?
 			aes_char_pixel_lighten : aes_char_pixel,
 		aes_fnt_large) ^
 		tree[ob].attr.state.selected;
@@ -404,8 +408,8 @@ static int aes_g_button_pixel(aes_id_t aes_id,
 {
 	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
-		justify_center_center, aes_char_pixel, aes_fnt_large) ^
-		tree[ob].attr.state.selected;
+		aes_area_justify_rectangle_center,
+		aes_char_pixel, aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
 
 static int aes_g_image_pixel(aes_id_t aes_id,
@@ -418,11 +422,12 @@ static int aes_g_image_pixel(aes_id_t aes_id,
 	if (!bitblk)
 		return 0;
 
-	const struct aes_area bitblk_area = justify_center_center(
-		(struct aes_rectangle) {
-			.w = bitblk->bi_wb * 8,
-			.h = bitblk->bi_hl
-		}, area);
+	const struct aes_area bitblk_area =
+		aes_area_justify_rectangle_center(
+			(struct aes_rectangle) {
+				.w = bitblk->bi_wb * 8,
+				.h = bitblk->bi_hl
+			}, area);
 
 	if (!aes_area_within(p, bitblk_area))
 		return 0;
@@ -442,11 +447,12 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 	if (!iconblk)
 		return 0;
 
-	const struct aes_area icon_area = justify_top_center(
-		(struct aes_rectangle) {
-			.w = iconblk->ib_icon.r.w,
-			.h = iconblk->ib_icon.r.h
-		}, area);
+	const struct aes_area icon_area =
+		aes_area_justify_rectangle_top_center(
+			(struct aes_rectangle) {
+				.w = iconblk->ib_icon.r.w,
+				.h = iconblk->ib_icon.r.h
+			}, area);
 
 	const struct fnt *fnt_small = aes_fnt_small(aes_id);
 
@@ -466,8 +472,8 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 
 		if (aes_area_within(p, char_area))
 			return aes_string_pixel(aes_id, p, char_area,
-				s, justify_center_center, aes_char_pixel,
-				aes_fnt_small) ?
+				s, aes_area_justify_rectangle_center,
+				aes_char_pixel, aes_fnt_small) ?
 					iconblk->ib_char.color.fg :
 					iconblk->ib_char.color.bg;
 	}
@@ -486,7 +492,8 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 	if (aes_area_within(p, text_area))
 		return aes_string_pixel(aes_id, p, text_area,
 			rsc_string_at_offset(iconblk->ib_text, rsc_),
-			justify_center_center, aes_char_pixel, aes_fnt_small);
+			aes_area_justify_rectangle_center,
+			aes_char_pixel, aes_fnt_small);
 
 	if (!aes_area_within(p, icon_area))
 		return 0;
