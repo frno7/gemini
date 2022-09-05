@@ -764,7 +764,7 @@ int main(int argc, char *argv[])
 
 	const struct rsc rsc = {
 		.size = f.size,
-		.header = (const struct rsc_header *)f.data
+		.header = (struct rsc_header *)f.data
 	};
 
 	if (option.identify) {

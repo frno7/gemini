@@ -16,7 +16,7 @@
 
 struct rsc {
 	size_t size;
-	const struct rsc_header *header;
+	struct rsc_header *header;
 };
 
 #define RSC_HEADER_FIELD(f)						\
