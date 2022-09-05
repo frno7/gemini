@@ -123,3 +123,20 @@ void pr_mem(FILE *f, const void *data, size_t size)
 
 	puts("");
 }
+
+void report_msg(void (*f)(const char *msg, void *arg), void *arg,
+	const char *prefix, const char *suffix, const char *fmt, va_list ap)
+{
+	if (!f)
+		return;
+
+	char buf[2048];
+	char msg[4096];
+
+	vsnprintf(buf, sizeof(buf), fmt, ap);
+	snprintf(msg, sizeof(msg), "%s%s%s%s%s",
+		prefix, prefix[0] ? ": " : "",
+		suffix, suffix[0] ? ": " : "", buf);
+
+	f(msg, arg);
+}

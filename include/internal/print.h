@@ -31,4 +31,7 @@ void NORETURN pr_bug(const char *file, int line,
 
 void pr_mem(FILE *f, const void *data, size_t size);
 
+void report_msg(void (*f)(const char *msg, void *arg), void *arg,
+	const char *prefix, const char *suffix, const char *fmt, va_list ap);
+
 #endif /* INTERNAL_PRINT_H */

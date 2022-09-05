@@ -8,6 +8,7 @@
 
 #include "internal/assert.h"
 #include "internal/compare.h"
+#include "internal/print.h"
 
 struct rsc_map_diagnostic {
 	struct rsc_map *map;
@@ -17,23 +18,6 @@ struct rsc_map_diagnostic {
 	void *arg;
 };
 
-static void report(void (*f)(const char *msg, void *arg), void *arg,
-	const char *prefix, const char *suffix, const char *fmt, va_list ap)
-{
-	if (!f)
-		return;
-
-	char buf[2048];
-	char msg[4096];
-
-	vsnprintf(buf, sizeof(buf), fmt, ap);
-	snprintf(msg, sizeof(msg), "%s%s%s%s%s",
-		prefix, prefix[0] ? ": " : "",
-		suffix, suffix[0] ? ": " : "", buf);
-
-	f(msg, arg);
-}
-
 static bool __attribute__((format(printf, 2, 3))) rsc_map_warning(
 	const struct rsc_map_diagnostic *map_diagnostic, char *fmt, ...)
 {
@@ -41,8 +25,8 @@ static bool __attribute__((format(printf, 2, 3))) rsc_map_warning(
 		va_list ap;
 
 		va_start(ap, fmt);
-		report(map_diagnostic->diagnostic->warning, map_diagnostic->arg,
-			"", "", fmt, ap);
+		report_msg(map_diagnostic->diagnostic->warning,
+			map_diagnostic->arg, "", "", fmt, ap);
 		va_end(ap);
 	}
 
@@ -56,8 +40,8 @@ static bool __attribute__((format(printf, 2, 3))) rsc_map_error(
 		va_list ap;
 
 		va_start(ap, fmt);
-		report(map_diagnostic->diagnostic->error, map_diagnostic->arg,
-			"", "", fmt, ap);
+		report_msg(map_diagnostic->diagnostic->error,
+			map_diagnostic->arg, "", "", fmt, ap);
 		va_end(ap);
 	}
 
@@ -70,7 +54,7 @@ static bool __attribute__((format(printf, 3, 4))) rsc_error(void *arg,
 	va_list ap;
 
 	va_start(ap, fmt);
-	report(diagnostic->error, arg, "", "", fmt, ap);
+	report_msg(diagnostic->error, arg, "", "", fmt, ap);
 	va_end(ap);
 
 	return false;
