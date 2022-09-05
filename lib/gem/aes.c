@@ -23,6 +23,25 @@ void aes_appl_exit(aes_id_t aes_id)
 	vdi_v_clswk(aes_id.aes_->vdi_id);
 }
 
+struct aes_iconblk_pixel aes_iconblk_pixel(const struct aes_point p,
+	const struct aes_iconblk *iconblk)
+{
+	if (p.x < 0 || p.y < 0 ||
+	    p.x >= iconblk->bitmap.area.r.w ||
+	    p.y >= iconblk->bitmap.area.r.h)
+		return (struct aes_iconblk_pixel) { };
+
+	const size_t offset = (p.x / 8) + (iconblk->bitmap.area.r.w / 8) * p.y;
+	const uint8_t d = iconblk->bitmap.data[offset];
+	const uint8_t m = iconblk->bitmap.mask[offset];
+	const uint8_t w = d & (0x80 >> (p.x & 0x7));
+
+	return (struct aes_iconblk_pixel) {
+		.data = (d & w) ? 1 : 0,
+		.mask = (m & w) ? 1 : 0,
+	};
+}
+
 static int aes_object_grid_to_x_px(const struct rsc_object_grid g,
 	const struct aes_rectangle cb)
 {
