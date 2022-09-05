@@ -154,6 +154,9 @@ void aes_appl_exit(aes_id_t aes_id);
 struct aes_iconblk_pixel aes_iconblk_pixel(const struct aes_point p,
 	const struct aes_iconblk *iconblk);
 
+bool aes_bitblk_pixel(const struct aes_point p,
+	const struct aes_bitblk *bitblk);
+
 bool aes_palette_color(aes_id_t aes_id,
 	const int index, struct vdi_color *color);
 

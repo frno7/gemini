@@ -42,6 +42,21 @@ struct aes_iconblk_pixel aes_iconblk_pixel(const struct aes_point p,
 	};
 }
 
+bool aes_bitblk_pixel(const struct aes_point p,
+	const struct aes_bitblk *bitblk)
+{
+	if (p.x < 0 || p.y < 0 ||
+	    p.x >= bitblk->area.r.w ||
+	    p.y >= bitblk->area.r.h)
+		return false;
+
+	const size_t offset = (p.x / 8) + (bitblk->area.r.w / 8) * p.y;
+	const uint8_t d = bitblk->data[offset];
+	const uint8_t w = d & (0x80 >> (p.x & 0x7));
+
+	return (d & w) != 0;
+}
+
 static int aes_object_grid_to_x_px(const struct rsc_object_grid g,
 	const struct aes_rectangle cb)
 {
