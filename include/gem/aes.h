@@ -54,7 +54,7 @@ bool aes_palette_color(aes_id_t aes_id,
 struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_);
 
-int aes_objc_pixel(aes_id_t aes_id, const int x, const int y,
+int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
 	const struct rsc_object *tree, const struct rsc *rsc_);
 
 #endif /* _GEM_AES_H */

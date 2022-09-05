@@ -708,7 +708,8 @@ static bool draw_rsc_pixel(uint16_t x, uint16_t y,
 	struct vdi_color color;
 
 	if (!aes_palette_color(arg->aes_id, aes_objc_pixel(arg->aes_id,
-			x, y, arg->tree, arg->rsc), &color))
+			(struct aes_point) { .x = x, .y = y },
+			arg->tree, arg->rsc), &color))
 		return true;
 
 	pixel->r = (0xffff * color.r + 500) / 1000;

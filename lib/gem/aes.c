@@ -222,68 +222,68 @@ struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	return aes_area_shrink(aes_objc_area(aes_id, ob, tree, rsc_), resize);
 }
 
-static bool aes_area_within(const int x, const int y,
+static bool aes_area_within(const struct aes_point p,
 	const struct aes_area area)
 {
-	return x >= area.p.x &&
-	       y >= area.p.y &&
-	       x <  area.p.x + area.r.w &&
-	       y <  area.p.y + area.r.h;
+	return p.x >= area.p.x &&
+	       p.y >= area.p.y &&
+	       p.x <  area.p.x + area.r.w &&
+	       p.y <  area.p.y + area.r.h;
 }
 
-static bool aes_objc_within_bounds(aes_id_t aes_id, const int x, const int y,
+static bool aes_objc_within_bounds(aes_id_t aes_id, const struct aes_point p,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	return aes_area_within(x, y, aes_objc_bounds(aes_id, ob, tree, rsc_));
+	return aes_area_within(p, aes_objc_bounds(aes_id, ob, tree, rsc_));
 }
 
-static int aes_objc_find(aes_id_t aes_id, const int x, const int y,
+static int aes_objc_find(aes_id_t aes_id, const struct aes_point p,
 	const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	int found = -1;
 
 	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree))
-		if (aes_objc_within_bounds(aes_id, x, y, ob, tree, rsc_))
+		if (aes_objc_within_bounds(aes_id, p, ob, tree, rsc_))
 			found = ob;
 
 	return found;
 }
 
-static bool aes_area_outline(const int x, const int y,
+static bool aes_area_outline(const struct aes_point p,
 	const struct aes_area area)
 {
-	return !aes_area_within(x, y, aes_area_shrink(area, -2)) &&
-		aes_area_within(x, y, aes_area_shrink(area, -3));
+	return !aes_area_within(p, aes_area_shrink(area, -2)) &&
+		aes_area_within(p, aes_area_shrink(area, -3));
 }
 
-static bool aes_area_border(const int x, const int y,
+static bool aes_area_border(const struct aes_point p,
 	const struct aes_area area, const int d)
 {
 	return !d     ? false :
-		d < 0 ? !aes_area_within(x, y, area) &&
-			 aes_area_within(x, y, aes_area_shrink(area, d)) :
-			!aes_area_within(x, y, aes_area_shrink(area, d)) &&
-			 aes_area_within(x, y, area);
+		d < 0 ? !aes_area_within(p, area) &&
+			 aes_area_within(p, aes_area_shrink(area, d)) :
+			!aes_area_within(p, aes_area_shrink(area, d)) &&
+			 aes_area_within(p, area);
 }
 
-typedef bool (*aes_char_pixel_f)(const int x, const int y,
+typedef bool (*aes_char_pixel_f)(const struct aes_point p,
 	const uint16_t c, const struct fnt *fnt);
 
-static bool aes_char_pixel(const int x, const int y,
+static bool aes_char_pixel(const struct aes_point p,
 	const uint16_t c, const struct fnt *fnt)
 {
-	return fnt_char_pixel(x, y, c, fnt);
+	return fnt_char_pixel(p.x, p.y, c, fnt);
 }
 
-static bool aes_char_pixel_lighten(const int x, const int y,
+static bool aes_char_pixel_lighten(const struct aes_point p,
 	const uint16_t c, const struct fnt *fnt)
 {
-	return fnt_char_lighten(x, y, c, fnt) &&
-	       fnt_char_pixel(x, y, c, fnt);
+	return fnt_char_lighten(p.x, p.y, c, fnt) &&
+	       fnt_char_pixel(p.x, p.y, c, fnt);
 }
 
 static bool aes_string_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area, const char *s,
+	const struct aes_point p, const struct aes_area area, const char *s,
 	const justification_f justification, const aes_char_pixel_f char_pixel,
 	const aes_fnt_f font)
 {
@@ -300,19 +300,21 @@ static bool aes_string_pixel(aes_id_t aes_id,
 	};
 	const struct aes_area text_area = justification(text_rectangle, area);
 
-	if (!fnt_ || !aes_area_within(x, y, text_area))
+	if (!fnt_ || !aes_area_within(p, text_area))
 		return false;
 
-	const int i  = (x - text_area.p.x) / grid.w;
+	const int i  = (p.x - text_area.p.x) / grid.w;
 
 	if (i < 0 || i >= length)
 		return false;
 
-	const int cx = (x - text_area.p.x) % grid.w;
-	const int cy =  y - text_area.p.y;
+	const struct aes_point cp = {
+		.x = (p.x - text_area.p.x) % grid.w,
+		.y =  p.y - text_area.p.y
+	};
 	const unsigned char c = s[i];
 
-	if (char_pixel(cx, cy, c, fnt_))
+	if (char_pixel(cp, c, fnt_))
 		return true;
 
 	return false;
@@ -326,7 +328,7 @@ static justification_f rsc_tedinfo_justification(const struct rsc_tedinfo *t)
 }
 
 static int aes_g_box_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	static const uint16_t patterns[8][4] = {
@@ -340,54 +342,54 @@ static int aes_g_box_pixel(aes_id_t aes_id,
 		{ 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF }
 	};
 
-	return (patterns[tree[ob].attr.spec.box.color.pattern & 0x7][y & 0x3] &
-		(0x8000 >> (x & 0xf))) ? tree[ob].attr.spec.box.color.fill : 0;
+	return (patterns[tree[ob].attr.spec.box.color.pattern & 0x7][p.y & 0x3] &
+		(0x8000 >> (p.x & 0xf))) ? tree[ob].attr.spec.box.color.fill : 0;
 }
 
 static int aes_g_boxchar_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const char s[] = { tree[ob].attr.spec.box.c, '\0' };
 
-	if (aes_string_pixel(aes_id, x, y, area, s,
+	if (aes_string_pixel(aes_id, p, area, s,
 			justify_center_center, aes_char_pixel, aes_fnt_large))
 		return !tree[ob].attr.state.selected;
 
-	return aes_g_box_pixel(aes_id, x, y, area, ob, tree, rsc_);
+	return aes_g_box_pixel(aes_id, p, area, ob, tree, rsc_);
 }
 
 static int aes_g_text_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_tedinfo *t =
 		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
-	return aes_string_pixel(aes_id, x, y, area,
+	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(t->te_text, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
 		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
 
 static int aes_g_ftext_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_tedinfo *t =
 		rsc_tedinfo_at_offset(tree[ob].attr.spec.tedinfo, rsc_);
 
-	return aes_string_pixel(aes_id, x, y, area,
+	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(t->te_tmplt, rsc_),
 		rsc_tedinfo_justification(t), aes_char_pixel,
 		aes_fnt_large) ^ tree[ob].attr.state.selected;
 }
 
 static int aes_g_string_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	return aes_string_pixel(aes_id, x, y, area,
+	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
 		justify_center_left, tree[ob].attr.state.disabled ?
 			aes_char_pixel_lighten : aes_char_pixel,
@@ -396,17 +398,17 @@ static int aes_g_string_pixel(aes_id_t aes_id,
 }
 
 static int aes_g_button_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	return aes_string_pixel(aes_id, x, y, area,
+	return aes_string_pixel(aes_id, p, area,
 		rsc_string_at_offset(tree[ob].attr.spec.string, rsc_),
 		justify_center_center, aes_char_pixel, aes_fnt_large) ^
 		tree[ob].attr.state.selected;
 }
 
 static int aes_g_image_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_bitblk *bitblk =
@@ -421,16 +423,16 @@ static int aes_g_image_pixel(aes_id_t aes_id,
 			.h = bitblk->bi_hl
 		}, area);
 
-	if (!aes_area_within(x, y, bitblk_area))
+	if (!aes_area_within(p, bitblk_area))
 		return 0;
 
 	return rsc_bitblk_pixel(
-		x - bitblk_area.p.x,
-		y - bitblk_area.p.y, bitblk, rsc_);
+		p.x - bitblk_area.p.x,
+		p.y - bitblk_area.p.y, bitblk, rsc_);
 }
 
 static int aes_g_icon_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	const struct rsc_iconblk *iconblk =
@@ -461,8 +463,8 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 
 		const char s[] = { iconblk->ib_char.c, '\0' };
 
-		if (aes_area_within(x, y, char_area))
-			return aes_string_pixel(aes_id, x, y, char_area,
+		if (aes_area_within(p, char_area))
+			return aes_string_pixel(aes_id, p, char_area,
 				s, justify_center_center, aes_char_pixel,
 				aes_fnt_small) ?
 					iconblk->ib_char.color.fg :
@@ -480,70 +482,70 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 		}
 	};
 
-	if (aes_area_within(x, y, text_area))
-		return aes_string_pixel(aes_id, x, y, text_area,
+	if (aes_area_within(p, text_area))
+		return aes_string_pixel(aes_id, p, text_area,
 			rsc_string_at_offset(iconblk->ib_text, rsc_),
 			justify_center_center, aes_char_pixel, aes_fnt_small);
 
-	if (!aes_area_within(x, y, icon_area))
+	if (!aes_area_within(p, icon_area))
 		return 0;
 
-	const struct rsc_iconblk_pixel p = rsc_iconblk_pixel(
-		x - icon_area.p.x,
-		y - icon_area.p.y, iconblk, rsc_);
+	const struct rsc_iconblk_pixel px = rsc_iconblk_pixel(
+		p.x - icon_area.p.x,
+		p.y - icon_area.p.y, iconblk, rsc_);
 
-	if (!p.data && !p.mask)
+	if (!px.data && !px.mask)
 		return 0;
 
-	return p.data;
+	return px.data;
 }
 
 static int aes_g_cicon_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
 static int aes_g_title_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
 static int aes_g_ibox_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
 static int aes_g_progdef_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
 static int aes_g_boxtext_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
 static int aes_g_fboxtext_pixel(aes_id_t aes_id,
-	const int x, const int y, const struct aes_area area,
+	const struct aes_point p, const struct aes_area area,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
 	return -1;	/* FIXME */
 }
 
-int aes_objc_pixel(aes_id_t aes_id, const int x, const int y,
+int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
 	const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	const int ob = aes_objc_find(aes_id, x, y, tree, rsc_);
+	const int ob = aes_objc_find(aes_id, p, tree, rsc_);
 
 	if (!rsc_valid_ob(ob))
 		return -1;
@@ -551,16 +553,16 @@ int aes_objc_pixel(aes_id_t aes_id, const int x, const int y,
 	const struct aes_area area = aes_objc_area(aes_id, ob, tree, rsc_);
 	const struct aes_object_border border = aes_objc_border(ob, tree, rsc_);
 
-	if (aes_area_border(x, y, area, border.thickness))
+	if (aes_area_border(p, area, border.thickness))
 		return border.color;
 
-	if (tree[ob].attr.state.outlined && aes_area_outline(x, y, area))
+	if (tree[ob].attr.state.outlined && aes_area_outline(p, area))
 		return border.color;
 
 	switch (tree[ob].attr.type.g) {
 #define RSC_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, spec_)		\
 	case n_: return aes_g_ ## symbol_ ## _pixel(			\
-		aes_id, x, y, area, ob, tree, rsc_);
+		aes_id, p, area, ob, tree, rsc_);
 GEM_OBJECT_G_TYPE(RSC_OBJECT_G_TYPE_SPEC)
 	}
 
