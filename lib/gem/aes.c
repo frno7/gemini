@@ -111,7 +111,7 @@ struct fnt *aes_fnt_small(aes_id_t aes_id)
 	return aes_id.aes_->vdi_id.vdi->font.small;
 }
 
-typedef struct aes_area (*justification_f)(
+typedef struct aes_area (*aes_area_justify_rectangle_f)(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area);
 
@@ -284,8 +284,8 @@ static bool aes_char_pixel_lighten(const struct aes_point p,
 
 static bool aes_string_pixel(aes_id_t aes_id,
 	const struct aes_point p, const struct aes_area area, const char *s,
-	const justification_f justification, const aes_char_pixel_f char_pixel,
-	const aes_fnt_f font)
+	const aes_area_justify_rectangle_f justify_text,
+	const aes_char_pixel_f char_pixel, const aes_fnt_f font)
 {
 	struct fnt *fnt_ = font(aes_id);
 	const size_t length = strlen(s);
@@ -298,7 +298,7 @@ static bool aes_string_pixel(aes_id_t aes_id,
 		.w = grid.w * length,
 		.h = grid.h
 	};
-	const struct aes_area text_area = justification(text_rectangle, area);
+	const struct aes_area text_area = justify_text(text_rectangle, area);
 
 	if (!fnt_ || !aes_area_within(p, text_area))
 		return false;
@@ -320,7 +320,8 @@ static bool aes_string_pixel(aes_id_t aes_id,
 	return false;
 }
 
-static justification_f rsc_tedinfo_justification(const struct rsc_tedinfo *t)
+static aes_area_justify_rectangle_f rsc_tedinfo_justification(
+	const struct rsc_tedinfo *t)
 {
 	return t->te_just == rsc_tedinfo_left  ? justify_center_left  :
 	       t->te_just == rsc_tedinfo_right ? justify_center_right :
