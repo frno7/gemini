@@ -6,6 +6,7 @@
 #include <gem/aes.h>
 #include <gem/aes-area.h>
 #include <gem/aes-rsc.h>
+#include <gem/aes-shape.h>
 #include <gem/vdi_.h>
 
 #include "internal/assert.h"
@@ -191,39 +192,26 @@ struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	return aes_area_shrink(aes_objc_area(aes_id, ob, tree, rsc_), resize);
 }
 
-static bool aes_objc_within_bounds(aes_id_t aes_id, const struct aes_point p,
-	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
+static bool aes_find_shape(aes_id_t aes_id, struct aes_object_shape *shape,
+	const struct aes_point p, const struct rsc_object *tree,
+	const struct rsc *rsc_)
 {
-	return aes_point_within_area(p, aes_objc_bounds(aes_id, ob, tree, rsc_));
-}
+	bool found = false;
 
-static int aes_objc_find(aes_id_t aes_id, const struct aes_point p,
-	const struct rsc_object *tree, const struct rsc *rsc_)
-{
-	int found = -1;
+	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree)) {
+		const struct aes_object_shape s = aes_rsc_object_shape(
+			aes_id, aes_objc_area(aes_id, ob, tree, rsc_).p,
+			&tree[ob], rsc_);
+		struct aes_object_shape simple;
 
-	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree))
-		if (aes_objc_within_bounds(aes_id, p, ob, tree, rsc_))
-			found = ob;
+		aes_for_each_simple_object_shape (&simple, s)
+			if (aes_point_within_area(p, simple.area)) {
+				*shape = simple;
+				found = true;
+			}
+	}
 
 	return found;
-}
-
-static bool aes_area_outline(const struct aes_point p,
-	const struct aes_area area)
-{
-	return !aes_point_within_area(p, aes_area_shrink(area, -2)) &&
-		aes_point_within_area(p, aes_area_shrink(area, -3));
-}
-
-static bool aes_area_border(const struct aes_point p,
-	const struct aes_area area, const int d)
-{
-	return !d     ? false :
-		d < 0 ? !aes_point_within_area(p, area) &&
-			 aes_point_within_area(p, aes_area_shrink(area, d)) :
-			!aes_point_within_area(p, aes_area_shrink(area, d)) &&
-			 aes_point_within_area(p, area);
 }
 
 typedef bool (*aes_char_pixel_f)(const struct aes_point p,
@@ -483,24 +471,12 @@ static int aes_g_fboxtext_pixel(aes_id_t aes_id,
 int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
 	const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	const int ob = aes_objc_find(aes_id, p, tree, rsc_);
+	struct aes_object_shape shape;
 
-	if (!rsc_valid_ob(ob))
+	if (!aes_find_shape(aes_id, &shape, p, tree, rsc_))
 		return -1;
 
-	const struct aes_area area = aes_objc_area(aes_id, ob, tree, rsc_);
-	const struct aes_object_border border = aes_objc_border(ob, tree, rsc_);
-
-	if (aes_area_border(p, area, border.thickness))
-		return border.color;
-
-	if (tree[ob].shape.state.outlined && aes_area_outline(p, area))
-		return border.color;
-
-	const struct aes_object_shape shape =
-		aes_rsc_object_shape(aes_id, area.p, &tree[ob], rsc_);
-
-	switch (tree[ob].shape.type.g) {
+	switch (shape.type.g) {
 #define AES_OBJECT_G_TYPE_SPEC(n_, symbol_, label_, spec_)		\
 	case n_: return aes_g_ ## symbol_ ## _pixel(aes_id, p, &shape);
 GEM_OBJECT_G_TYPE(AES_OBJECT_G_TYPE_SPEC)
