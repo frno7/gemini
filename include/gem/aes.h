@@ -166,4 +166,32 @@ struct aes_area aes_objc_bounds(aes_id_t aes_id,
 int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
 	const struct rsc_object *tree, const struct rsc *rsc_);
 
+static inline struct aes_point aes_point_add(
+	const struct aes_point a,
+	const struct aes_point b)
+{
+	return (struct aes_point) {
+		.x = a.x + b.x,
+		.y = a.y + b.y
+	};
+}
+
+static inline struct aes_point aes_point_sub(
+	const struct aes_point a,
+	const struct aes_point b)
+{
+	return (struct aes_point) {
+		.x = a.x - b.x,
+		.y = a.y - b.y
+	};
+}
+
+static inline struct aes_point aes_point_negate(struct aes_point p)
+{
+	return (struct aes_point) {
+		.x = -p.x,
+		.y = -p.y
+	};
+}
+
 #endif /* _GEM_AES_H */
