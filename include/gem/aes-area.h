@@ -85,4 +85,26 @@ static inline struct aes_area aes_area_shrink(
 		}, area);
 }
 
+static inline struct aes_area aes_area_bounds(
+	struct aes_area a,
+	struct aes_area b)
+{
+	const struct aes_point pmin = {
+		.x = min(a.p.x, b.p.x),
+		.y = min(a.p.y, b.p.y)
+	};
+	const struct aes_point pmax = {
+		.x = max(a.p.x + a.r.w, b.p.x + b.r.w),
+		.y = max(a.p.y + a.r.h, b.p.y + b.r.h)
+	};
+
+	return (struct aes_area) {
+		.p = pmin,
+		.r = {
+			.w = pmax.x - pmin.x,
+			.h = pmax.y - pmin.y
+		},
+	};
+}
+
 #endif /* _GEM_AES_AREA_H */
