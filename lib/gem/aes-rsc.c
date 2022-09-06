@@ -3,7 +3,9 @@
  * Copyright (C) 2022 Fredrik Noring
  */
 
+#include <gem/aes-area.h>
 #include <gem/aes-rsc.h>
+#include <gem/aes-shape.h>
 
 static struct aes_rectangle aes_rsc_grid(aes_id_t aes_id)
 {
@@ -295,4 +297,20 @@ int16_t aes_rsc_tree_traverse_with_origin(aes_id_t aes_id,
 			*origin = aes_point_sub(*origin, aes_point_from_rcs(
 				aes_id, tree[nx].shape.area.p));
 	}
+}
+
+struct aes_area aes_rsc_tree_bounds(aes_id_t aes_id,
+	const struct rsc_object *tree, const struct rsc *rsc)
+{
+	const struct aes_object_shape shape = aes_rsc_object_shape(aes_id,
+		(struct aes_point) { }, &tree[0], rsc);
+	struct aes_object_shape simple;
+	struct aes_area bounds = { };
+	int i = 0;
+
+	aes_for_each_simple_object_shape (&simple, shape)
+		bounds = !i++ ? simple.area :
+			aes_area_bounds(bounds, simple.area);
+
+	return bounds;
 }

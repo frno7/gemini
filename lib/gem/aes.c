@@ -82,28 +82,12 @@ bool aes_palette_color(aes_id_t aes_id,
 	return vq_color(aes_id.aes_->vdi_id, index, color);
 }
 
-struct aes_area aes_objc_bounds(aes_id_t aes_id,
-	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
-{
-	const struct aes_object_shape shape = aes_rsc_object_shape(aes_id,
-		(struct aes_point) { }, &tree[ob], rsc_);
-	struct aes_object_shape simple;
-	struct aes_area bounds = { };
-	int i = 0;
-
-	aes_for_each_simple_object_shape (&simple, shape)
-		bounds = !i++ ? simple.area :
-			aes_area_bounds(bounds, simple.area);
-
-	return bounds;
-}
-
 static bool aes_find_shape(aes_id_t aes_id, struct aes_object_shape *shape,
 	const struct aes_point p, const struct rsc_object *tree,
 	const struct rsc *rsc_)
 {
 	struct aes_point origin =
-		aes_point_negate(aes_objc_bounds(aes_id, 0, tree, rsc_).p);
+		aes_point_negate(aes_rsc_tree_bounds(aes_id, tree, rsc_).p);
 	bool found = false;
 
 	for (int16_t ob = 0; rsc_valid_ob(ob);

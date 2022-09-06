@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include <gem/aes.h>
+#include <gem/aes-rsc.h>
 #include <gem/rsc.h>
 #include <gem/rsc-map.h>
 
@@ -693,7 +694,7 @@ static bool draw_rsc_image(uint16_t *width, uint16_t *height, void *arg_)
 	arg->tree = rsc_tree_at_index(arg->i++, arg->rsc);
 
 	const struct aes_area bounds =
-		aes_objc_bounds(arg->aes_id, 0, arg->tree, arg->rsc);
+		aes_rsc_tree_bounds(arg->aes_id, arg->tree, arg->rsc);
 
 	*width = bounds.r.w;
 	*height = bounds.r.h;
