@@ -59,81 +59,10 @@ bool aes_bitblk_pixel(const struct aes_point p,
 	return (d & w) != 0;
 }
 
-static int aes_object_grid_to_x_px(const struct rsc_object_grid g,
-	const struct aes_rectangle cb)
-{
-	return cb.w * g.ch + g.px;
-}
-
-static int aes_object_grid_to_y_px(const struct rsc_object_grid g,
-	const struct aes_rectangle cb)
-{
-	return cb.h * g.ch + g.px;
-}
-
-struct rsc_object_grid rsc_object_grid_add(
-	const struct rsc_object_grid a,
-	const struct rsc_object_grid b)
-{
-	return (struct rsc_object_grid) {
-		.px = a.px + b.px,
-		.ch = a.ch + b.ch
-	};
-}
-
-struct rsc_object_point rsc_object_point_add(
-	const struct rsc_object_point a,
-	const struct rsc_object_point b)
-{
-	return (struct rsc_object_point) {
-		.x = rsc_object_grid_add(a.x, b.x),
-		.y = rsc_object_grid_add(a.y, b.y)
-	};
-}
-
-static struct rsc_object_point rsc_tree_object_origin(int16_t ob,
-	const struct rsc_object *tree)
-{
-	BUG_ON(!rsc_valid_ob(ob));
-
-	const int outline = tree->shape.state.outlined ? 3 : 0;
-	struct rsc_object_point origin = {
-		.x = { .px = outline },
-		.y = { .px = outline }
-	};
-
-	/* Ignore root object position */
-	for (; ob > 0; ob = rsc_object_parent(ob, tree))
-		origin = rsc_object_point_add(origin, tree[ob].shape.area.p);
-
-	return origin;
-}
-
 struct aes_object_border {
 	int color;
 	int thickness;
 };
-
-static struct aes_object_border aes_objc_border(const int ob,
-	const struct rsc_object *tree, const struct rsc *rsc_)
-{
-	switch (tree[ob].shape.type.g) {
-	case GEM_G_BOX:
-	case GEM_G_BOXCHAR:
-		return (struct aes_object_border) {
-			.color = tree[ob].shape.spec.box.color.border,
-			.thickness = tree[ob].shape.spec.box.thickness
-		};
-	case GEM_G_BUTTON:
-		return (struct aes_object_border) {
-			.color = 1,
-			.thickness = (tree[ob].shape.flags.exit     ? -1 : 0) +
-				     (tree[ob].shape.flags.default_ ? -1 : 0) - 1
-		};
-	}
-
-	return (struct aes_object_border) { };
-}
 
 typedef struct fnt *(*aes_fnt_f)(aes_id_t aes_id);
 
@@ -147,61 +76,41 @@ struct fnt *aes_fnt_small(aes_id_t aes_id)
 	return aes_id.aes_->vdi_id.vdi->font.small;
 }
 
-static struct aes_rectangle aes_grid(aes_id_t aes_id)
-{
-	const struct fnt *fnt_ = aes_fnt_large(aes_id);
-
-	return (struct aes_rectangle) {
-		.w = fnt_ ? fnt_->header->max_cell_width : 0,
-		.h = fnt_ ? fnt_->header->bitmap_lines : 0
-	};
-}
-
 bool aes_palette_color(aes_id_t aes_id,
 	const int index, struct vdi_color *color)
 {
 	return vq_color(aes_id.aes_->vdi_id, index, color);
 }
 
-struct aes_area aes_objc_area(aes_id_t aes_id,
-	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
-{
-	const struct aes_rectangle grid = aes_grid(aes_id);
-	const struct rsc_object_point p0 = rsc_tree_object_origin(ob, tree);
-	const struct rsc_object_rectangle r0 = tree[ob].shape.area.r;
-
-	return (struct aes_area) {
-		.p = {
-			.x = aes_object_grid_to_x_px(p0.x, grid),
-			.y = aes_object_grid_to_y_px(p0.y, grid)
-		},
-		.r = {
-			.w = aes_object_grid_to_x_px(r0.w, grid),
-			.h = aes_object_grid_to_y_px(r0.h, grid)
-		}
-	};
-}
-
 struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	const int outline = tree[ob].shape.state.outlined ? -3 : 0;
-	const int border = aes_objc_border(ob, tree, rsc_).thickness;
-	const int resize = min(border, outline);
+	const struct aes_object_shape shape = aes_rsc_object_shape(aes_id,
+		(struct aes_point) { }, &tree[ob], rsc_);
+	struct aes_object_shape simple;
+	struct aes_area bounds = { };
+	int i = 0;
 
-	return aes_area_shrink(aes_objc_area(aes_id, ob, tree, rsc_), resize);
+	aes_for_each_simple_object_shape (&simple, shape)
+		bounds = !i++ ? simple.area :
+			aes_area_bounds(bounds, simple.area);
+
+	return bounds;
 }
 
 static bool aes_find_shape(aes_id_t aes_id, struct aes_object_shape *shape,
 	const struct aes_point p, const struct rsc_object *tree,
 	const struct rsc *rsc_)
 {
+	struct aes_point origin =
+		aes_point_negate(aes_objc_bounds(aes_id, 0, tree, rsc_).p);
 	bool found = false;
 
-	for (int16_t ob = 0; rsc_valid_ob(ob); ob = rsc_tree_traverse(ob, tree)) {
+	for (int16_t ob = 0; rsc_valid_ob(ob);
+			ob = aes_rsc_tree_traverse_with_origin(
+				aes_id, &origin, ob, tree)) {
 		const struct aes_object_shape s = aes_rsc_object_shape(
-			aes_id, aes_objc_area(aes_id, ob, tree, rsc_).p,
-			&tree[ob], rsc_);
+			aes_id, origin, &tree[ob], rsc_);
 		struct aes_object_shape simple;
 
 		aes_for_each_simple_object_shape (&simple, s)
