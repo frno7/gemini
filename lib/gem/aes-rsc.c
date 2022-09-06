@@ -49,6 +49,17 @@ static struct aes_area aes_rsc_object_shape_area(aes_id_t aes_id,
 	};
 }
 
+static struct aes_point aes_point_from_rcs(
+	aes_id_t aes_id, const struct rsc_object_point p)
+{
+	const struct aes_rectangle gr = aes_rsc_grid(aes_id);
+
+	return (struct aes_point) {
+		.x = gr.w * p.x.ch + p.x.px,
+		.y = gr.h * p.y.ch + p.y.px
+	};
+}
+
 static struct aes_object_color aes_rsc_object_color(
 	const struct rsc_object_color color)
 {
@@ -249,4 +260,39 @@ struct aes_object_shape aes_rsc_object_shape(aes_id_t aes_id,
 		.spec  = aes_rsc_object_shape_spec(aes_id, ro, rsc),
 		.area  = aes_rsc_object_shape_area(aes_id, p, ro->shape.area.r)
 	};
+}
+
+int16_t aes_rsc_tree_traverse_with_origin(aes_id_t aes_id,
+	struct aes_point *origin, int16_t ob, const struct rsc_object *tree)
+{
+	if (rsc_valid_ob(tree[ob].link.head)) {
+		*origin = aes_point_add(*origin, aes_point_from_rcs(
+			aes_id, tree[tree[ob].link.head].shape.area.p));
+
+		return tree[ob].link.head;	/* Advance to the child */
+	}
+
+	if (ob)
+		*origin = aes_point_sub(*origin, aes_point_from_rcs(
+			aes_id, tree[ob].shape.area.p));
+
+	for (;;) {
+		const int16_t nx = tree[ob].link.next;
+
+		if (!rsc_valid_ob(nx))
+			return nx;		/* Unable to advance */
+
+		if (ob != tree[nx].link.tail) {
+			*origin = aes_point_add(*origin, aes_point_from_rcs(
+				aes_id, tree[nx].shape.area.p));
+
+			return nx;		/* Advance to the sibling */
+		}
+
+		ob = nx;			/* Advance to the parent */
+
+		if (ob)
+			*origin = aes_point_sub(*origin, aes_point_from_rcs(
+				aes_id, tree[nx].shape.area.p));
+	}
 }
