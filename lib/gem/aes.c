@@ -191,19 +191,10 @@ struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	return aes_area_shrink(aes_objc_area(aes_id, ob, tree, rsc_), resize);
 }
 
-static bool aes_area_within(const struct aes_point p,
-	const struct aes_area area)
-{
-	return p.x >= area.p.x &&
-	       p.y >= area.p.y &&
-	       p.x <  area.p.x + area.r.w &&
-	       p.y <  area.p.y + area.r.h;
-}
-
 static bool aes_objc_within_bounds(aes_id_t aes_id, const struct aes_point p,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_)
 {
-	return aes_area_within(p, aes_objc_bounds(aes_id, ob, tree, rsc_));
+	return aes_point_within_area(p, aes_objc_bounds(aes_id, ob, tree, rsc_));
 }
 
 static int aes_objc_find(aes_id_t aes_id, const struct aes_point p,
@@ -221,18 +212,18 @@ static int aes_objc_find(aes_id_t aes_id, const struct aes_point p,
 static bool aes_area_outline(const struct aes_point p,
 	const struct aes_area area)
 {
-	return !aes_area_within(p, aes_area_shrink(area, -2)) &&
-		aes_area_within(p, aes_area_shrink(area, -3));
+	return !aes_point_within_area(p, aes_area_shrink(area, -2)) &&
+		aes_point_within_area(p, aes_area_shrink(area, -3));
 }
 
 static bool aes_area_border(const struct aes_point p,
 	const struct aes_area area, const int d)
 {
 	return !d     ? false :
-		d < 0 ? !aes_area_within(p, area) &&
-			 aes_area_within(p, aes_area_shrink(area, d)) :
-			!aes_area_within(p, aes_area_shrink(area, d)) &&
-			 aes_area_within(p, area);
+		d < 0 ? !aes_point_within_area(p, area) &&
+			 aes_point_within_area(p, aes_area_shrink(area, d)) :
+			!aes_point_within_area(p, aes_area_shrink(area, d)) &&
+			 aes_point_within_area(p, area);
 }
 
 typedef bool (*aes_char_pixel_f)(const struct aes_point p,
@@ -269,7 +260,7 @@ static bool aes_string_pixel(aes_id_t aes_id,
 	};
 	const struct aes_area text_area = justify_text(text_rectangle, area);
 
-	if (!fnt_ || !aes_area_within(p, text_area))
+	if (!fnt_ || !aes_point_within_area(p, text_area))
 		return false;
 
 	const int i  = (p.x - text_area.p.x) / grid.w;
@@ -379,7 +370,7 @@ static int aes_g_image_pixel(aes_id_t aes_id,
 		aes_area_justify_rectangle_center(
 			bitblk->area.r, shape->area);
 
-	if (!aes_area_within(p, bitblk_area))
+	if (!aes_point_within_area(p, bitblk_area))
 		return 0;
 
 	return aes_bitblk_pixel((struct aes_point) {
@@ -413,7 +404,7 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 
 		const char s[] = { iconblk->char_.c, '\0' };
 
-		if (aes_area_within(p, char_area))
+		if (aes_point_within_area(p, char_area))
 			return aes_string_pixel(aes_id, p, char_area,
 				s, aes_area_justify_rectangle_center,
 				aes_char_pixel, aes_fnt_small) ?
@@ -432,13 +423,13 @@ static int aes_g_icon_pixel(aes_id_t aes_id,
 		}
 	};
 
-	if (aes_area_within(p, text_area))
+	if (aes_point_within_area(p, text_area))
 		return aes_string_pixel(aes_id, p, text_area,
 			iconblk->text.s,
 			aes_area_justify_rectangle_center,
 			aes_char_pixel, aes_fnt_small);
 
-	if (!aes_area_within(p, icon_area))
+	if (!aes_point_within_area(p, icon_area))
 		return 0;
 
 	const struct aes_iconblk_pixel px = aes_iconblk_pixel(

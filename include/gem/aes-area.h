@@ -10,6 +10,15 @@
 
 #include "internal/compare.h"
 
+static inline bool aes_point_within_area(const struct aes_point p,
+	const struct aes_area area)
+{
+	return p.x >= area.p.x &&
+	       p.y >= area.p.y &&
+	       p.x <  area.p.x + area.r.w &&
+	       p.y <  area.p.y + area.r.h;
+}
+
 typedef struct aes_area (*aes_area_justify_rectangle_f)(
 	const struct aes_rectangle rectangle,
 	const struct aes_area area);
