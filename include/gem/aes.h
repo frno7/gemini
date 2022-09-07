@@ -163,9 +163,6 @@ bool aes_palette_color(aes_id_t aes_id,
 struct aes_area aes_objc_bounds(aes_id_t aes_id,
 	const int ob, const struct rsc_object *tree, const struct rsc *rsc_);
 
-int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
-	const struct rsc_object *tree, const struct rsc *rsc_);
-
 static inline struct aes_point aes_point_add(
 	const struct aes_point a,
 	const struct aes_point b)
@@ -201,5 +198,13 @@ struct aes_object_shape_iterator {
 		struct aes_object_shape_iterator *iterator);
 	void *arg;
 };
+
+#define aes_for_each_object_shape(shape, iterator)			\
+	for (bool valid__ = iterator->first((shape), (iterator));	\
+	     valid__;							\
+	     valid__ = iterator->next((shape), (iterator)))
+
+int aes_object_shape_pixel(aes_id_t aes_id, const struct aes_point p,
+	struct aes_object_shape_iterator *iterator);
 
 #endif /* _GEM_AES_H */

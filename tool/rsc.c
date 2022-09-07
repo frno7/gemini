@@ -682,22 +682,25 @@ static bool print_rsc_map(const struct rsc *rsc)
 
 struct draw_rsc_arg {
 	int i;
+	struct aes_area bounds;
+
 	aes_id_t aes_id;
-	const struct rsc_object *tree;
 	const struct rsc *rsc;
+	struct aes_object_shape_iterator iterator;
+	struct aes_rsc_object_shape_iterator_arg arg;
 };
 
 static bool draw_rsc_image(uint16_t *width, uint16_t *height, void *arg_)
 {
 	struct draw_rsc_arg *arg = arg_;
+	struct rsc_object *tree = rsc_tree_at_index(++arg->i, arg->rsc);
 
-	arg->tree = rsc_tree_at_index(arg->i++, arg->rsc);
+	arg->bounds = aes_rsc_tree_bounds(arg->aes_id, tree, arg->rsc);
+	arg->iterator = aes_rsc_object_shape_iterator(
+		arg->aes_id, tree, arg->rsc, &arg->arg);
 
-	const struct aes_area bounds =
-		aes_rsc_tree_bounds(arg->aes_id, arg->tree, arg->rsc);
-
-	*width = bounds.r.w;
-	*height = bounds.r.h;
+	*width  = arg->bounds.r.w;
+	*height = arg->bounds.r.h;
 
 	return true;
 }
@@ -708,9 +711,11 @@ static bool draw_rsc_pixel(uint16_t x, uint16_t y,
 	struct draw_rsc_arg *arg = arg_;
 	struct vdi_color color;
 
-	if (!aes_palette_color(arg->aes_id, aes_objc_pixel(arg->aes_id,
-			(struct aes_point) { .x = x, .y = y },
-			arg->tree, arg->rsc), &color))
+	struct aes_point p = aes_point_add(arg->bounds.p,
+		(struct aes_point) { .x = x, .y = y });
+
+	if (!aes_palette_color(arg->aes_id, aes_object_shape_pixel(
+			arg->aes_id, p, &arg->iterator), &color))
 		return true;
 
 	pixel->r = (0xffff * color.r + 500) / 1000;
@@ -725,6 +730,7 @@ static bool draw_rsc(const struct rsc *rsc)
 {
 	struct aes aes_ = { };
 	struct draw_rsc_arg arg = {
+		.i = -1,
 		.aes_id = aes_appl_init(&aes_),
 		.rsc = rsc
 	};

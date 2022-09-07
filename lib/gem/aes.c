@@ -5,7 +5,6 @@
 
 #include <gem/aes.h>
 #include <gem/aes-area.h>
-#include <gem/aes-rsc.h>
 #include <gem/aes-shape.h>
 #include <gem/vdi_.h>
 
@@ -77,19 +76,13 @@ bool aes_palette_color(aes_id_t aes_id,
 	return vq_color(aes_id.aes_->vdi_id, index, color);
 }
 
-static bool aes_find_shape(aes_id_t aes_id, struct aes_object_shape *shape,
-	const struct aes_point p, const struct rsc_object *tree,
-	const struct rsc *rsc_)
+static bool aes_find_shape(struct aes_object_shape *shape,
+	const struct aes_point p, struct aes_object_shape_iterator *iterator)
 {
-	struct aes_point origin =
-		aes_point_negate(aes_rsc_tree_bounds(aes_id, tree, rsc_).p);
+	struct aes_object_shape s;
 	bool found = false;
 
-	for (int16_t ob = 0; rsc_valid_ob(ob);
-			ob = aes_rsc_tree_traverse_with_origin(
-				aes_id, &origin, ob, tree)) {
-		const struct aes_object_shape s = aes_rsc_object_shape(
-			aes_id, origin, &tree[ob], rsc_);
+	aes_for_each_object_shape (&s, iterator) {
 		struct aes_object_shape simple;
 
 		aes_for_each_simple_object_shape (&simple, s)
@@ -356,12 +349,12 @@ static int aes_g_fboxtext_pixel(aes_id_t aes_id,
 	return -1;	/* FIXME */
 }
 
-int aes_objc_pixel(aes_id_t aes_id, const struct aes_point p,
-	const struct rsc_object *tree, const struct rsc *rsc_)
+int aes_object_shape_pixel(aes_id_t aes_id, const struct aes_point p,
+	struct aes_object_shape_iterator *iterator)
 {
 	struct aes_object_shape shape;
 
-	if (!aes_find_shape(aes_id, &shape, p, tree, rsc_))
+	if (!aes_find_shape(&shape, p, iterator))
 		return -1;
 
 	switch (shape.type.g) {
