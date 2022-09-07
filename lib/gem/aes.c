@@ -59,11 +59,6 @@ bool aes_bitblk_pixel(const struct aes_point p,
 	return (d & w) != 0;
 }
 
-struct aes_object_border {
-	int color;
-	int thickness;
-};
-
 typedef struct fnt *(*aes_fnt_f)(aes_id_t aes_id);
 
 struct fnt *aes_fnt_large(aes_id_t aes_id)
