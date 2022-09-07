@@ -199,11 +199,6 @@ struct aes_object_shape_iterator {
 	void *arg;
 };
 
-#define aes_for_each_object_shape(shape, iterator)			\
-	for (bool valid__ = iterator->first((shape), (iterator));	\
-	     valid__;							\
-	     valid__ = iterator->next((shape), (iterator)))
-
 int aes_object_shape_pixel(aes_id_t aes_id, const struct aes_point p,
 	struct aes_object_shape_iterator *iterator);
 
