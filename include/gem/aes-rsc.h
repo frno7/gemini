@@ -19,4 +19,16 @@ int16_t aes_rsc_tree_traverse_with_origin(aes_id_t aes_id,
 struct aes_area aes_rsc_tree_bounds(aes_id_t aes_id,
 	const struct rsc_object *tree, const struct rsc *rsc);
 
+struct aes_rsc_object_shape_iterator_arg {
+	struct aes_point origin;
+	aes_id_t aes_id;
+	int16_t ob;
+	const struct rsc_object *tree;
+	const struct rsc *rsc;
+};
+
+struct aes_object_shape_iterator aes_rsc_object_shape_iterator(
+	aes_id_t aes_id, const struct rsc_object *tree, const struct rsc *rsc,
+	struct aes_rsc_object_shape_iterator_arg *arg);
+
 #endif /* _GEM_AES_RSC_H */

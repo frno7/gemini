@@ -194,4 +194,12 @@ static inline struct aes_point aes_point_negate(struct aes_point p)
 	};
 }
 
+struct aes_object_shape_iterator {
+	bool (*first)(struct aes_object_shape *shape,
+		struct aes_object_shape_iterator *iterator);
+	bool (*next)(struct aes_object_shape *shape,
+		struct aes_object_shape_iterator *iterator);
+	void *arg;
+};
+
 #endif /* _GEM_AES_H */

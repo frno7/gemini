@@ -314,3 +314,52 @@ struct aes_area aes_rsc_tree_bounds(aes_id_t aes_id,
 
 	return bounds;
 }
+
+static bool aes_rsc_object_first_shape(
+	struct aes_object_shape *shape,
+	struct aes_object_shape_iterator *iterator)
+{
+	struct aes_rsc_object_shape_iterator_arg *arg = iterator->arg;
+
+	arg->ob = 0;
+
+	*shape = aes_rsc_object_shape(arg->aes_id,
+		arg->origin, &arg->tree[arg->ob], arg->rsc);
+
+	return true;
+}
+
+static bool aes_rsc_object_next_shape(
+	struct aes_object_shape *shape,
+	struct aes_object_shape_iterator *iterator)
+{
+	struct aes_rsc_object_shape_iterator_arg *arg = iterator->arg;
+
+	arg->ob = aes_rsc_tree_traverse_with_origin(
+		arg->aes_id, &arg->origin, arg->ob, arg->tree);
+
+	if (!rsc_valid_ob(arg->ob))
+		return false;
+
+	*shape = aes_rsc_object_shape(arg->aes_id,
+		arg->origin, &arg->tree[arg->ob], arg->rsc);
+
+	return true;
+}
+
+struct aes_object_shape_iterator aes_rsc_object_shape_iterator(
+	aes_id_t aes_id, const struct rsc_object *tree, const struct rsc *rsc,
+	struct aes_rsc_object_shape_iterator_arg *arg)
+{
+	*arg = (struct aes_rsc_object_shape_iterator_arg) {
+		.aes_id = aes_id,
+		.tree   = tree,
+		.rsc    = rsc
+	};
+
+	return (struct aes_object_shape_iterator) {
+		.first = aes_rsc_object_first_shape,
+		.next  = aes_rsc_object_next_shape,
+		.arg   = arg
+	};
+}
