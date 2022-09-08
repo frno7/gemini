@@ -136,4 +136,11 @@ static inline bool aes_area_degenerate(struct aes_area area)
 	       area.r.h <= 0;
 }
 
+static inline bool aes_area_overlap(
+	struct aes_area a,
+	struct aes_area b)
+{
+	return !aes_area_degenerate(aes_area_intersection(a, b));
+}
+
 #endif /* _GEM_AES_AREA_H */
