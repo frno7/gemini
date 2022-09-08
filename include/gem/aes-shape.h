@@ -31,4 +31,14 @@ struct aes_object_simple_shape_enumerator aes_object_next_simple_shape(
 	struct aes_object_shape *simple, const struct aes_object_shape shape,
 	struct aes_object_simple_shape_enumerator e);
 
+struct aes_object_simple_shape_iterator_arg {
+	struct aes_object_shape shape;
+	struct aes_object_shape_iterator iterator;
+	struct aes_object_simple_shape_enumerator enumerator;
+};
+
+struct aes_object_shape_iterator aes_object_simple_shape_iterator(
+	struct aes_object_shape_iterator *iterator,
+	struct aes_object_simple_shape_iterator_arg *arg);
+
 #endif /* _GEM_AES_SHAPE_H */

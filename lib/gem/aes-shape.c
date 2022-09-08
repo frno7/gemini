@@ -111,3 +111,53 @@ struct aes_object_simple_shape_enumerator aes_object_next_simple_shape(
 {
 	return aes_object_simple_shape(e.i + 1, simple, shape);
 }
+
+static bool aes_object_first_simple_shape_(
+	struct aes_object_shape *shape,
+	struct aes_object_shape_iterator *iterator)
+{
+	struct aes_object_simple_shape_iterator_arg *arg = iterator->arg;
+
+	if (!arg->iterator.first(&arg->shape, &arg->iterator))
+		return false;
+
+	arg->enumerator = aes_object_first_simple_shape(shape, arg->shape);
+
+	return arg->enumerator.i < arg->enumerator.n;
+}
+
+static bool aes_object_next_simple_shape_(
+	struct aes_object_shape *shape,
+	struct aes_object_shape_iterator *iterator)
+{
+	struct aes_object_simple_shape_iterator_arg *arg = iterator->arg;
+
+	if (arg->enumerator.i < arg->enumerator.n)
+		arg->enumerator = aes_object_next_simple_shape(
+			shape, arg->shape, arg->enumerator);
+
+	if (arg->enumerator.i >= arg->enumerator.n) {
+		if (!arg->iterator.next(&arg->shape, &arg->iterator))
+			return false;
+
+		arg->enumerator = aes_object_first_simple_shape(
+			shape, arg->shape);
+	}
+
+	return arg->enumerator.i < arg->enumerator.n;
+}
+
+struct aes_object_shape_iterator aes_object_simple_shape_iterator(
+	struct aes_object_shape_iterator *iterator,
+	struct aes_object_simple_shape_iterator_arg *arg)
+{
+	*arg = (struct aes_object_simple_shape_iterator_arg) {
+		.iterator = *iterator
+	};
+
+	return (struct aes_object_shape_iterator) {
+		.first = aes_object_first_simple_shape_,
+		.next  = aes_object_next_simple_shape_,
+		.arg   = arg
+	};
+}
