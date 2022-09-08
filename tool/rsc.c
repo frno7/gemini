@@ -683,7 +683,14 @@ static bool print_rsc_map(const struct rsc *rsc)
 
 struct draw_rsc_arg {
 	int i;
+	struct aes_area clip;
 	struct aes_area bounds;
+
+	struct draw_rsc_arg_pixel_buffer {
+		size_t i;
+		size_t n;
+		struct tiff_pixel px[64];
+	} buffer;
 
 	aes_id_t aes_id;
 	const struct rsc *rsc;
@@ -703,6 +710,42 @@ static bool draw_rsc_image(uint16_t *width, uint16_t *height, void *arg_)
 	*width  = arg->bounds.r.w;
 	*height = arg->bounds.r.h;
 
+	arg->buffer = (struct draw_rsc_arg_pixel_buffer) { };
+
+	return true;
+}
+
+static bool draw_rsc_layer(const struct aes_area clip,
+	const struct aes_object_shape_layer *layers, void *arg_)
+{
+	struct draw_rsc_arg *arg = arg_;
+	struct vdi_color color;
+
+	for (int x = 0; x < clip.r.w; x++) {
+		const struct aes_point p = {
+			.x = clip.p.x + x,
+			.y = clip.p.y
+		};
+
+		if (!aes_palette_color(arg->aes_id, aes_object_shape_pixel(
+				arg->aes_id, p, &layers->shape), &color))
+			return true;
+
+		const int n = x + clip.p.x - arg->clip.p.x;
+
+		BUG_ON(n < 0 || n >= ARRAY_SIZE(arg->buffer.px));
+		BUG_ON(n < 0 || n >= arg->clip.r.w);
+		BUG_ON(clip.r.w > ARRAY_SIZE(arg->buffer.px));
+		BUG_ON(clip.r.h != 1);
+
+		arg->buffer.px[n] = (struct tiff_pixel) {
+			.r = (0xffff * color.r + 500) / 1000,
+			.g = (0xffff * color.g + 500) / 1000,
+			.b = (0xffff * color.b + 500) / 1000,
+			.a =  0xffff
+		};
+	}
+
 	return true;
 }
 
@@ -710,19 +753,32 @@ static bool draw_rsc_pixel(uint16_t x, uint16_t y,
 	struct tiff_pixel *pixel, void *arg_)
 {
 	struct draw_rsc_arg *arg = arg_;
-	struct vdi_color color;
+
+	if (arg->buffer.i < arg->buffer.n)
+		goto draw;
+
+	BUG_ON(x >= arg->bounds.r.w);
+
+	arg->buffer = (struct draw_rsc_arg_pixel_buffer) { };
+	arg->buffer.n = min_t(size_t,
+		arg->bounds.r.w - x, ARRAY_SIZE(arg->buffer.px));
 
 	struct aes_point p = aes_point_add(arg->bounds.p,
 		(struct aes_point) { .x = x, .y = y });
+	arg->clip = (struct aes_area) {
+		.p = p,
+		.r = {
+			.w = arg->buffer.n,
+			.h = 1
+		},
+	};
 
-	if (!aes_palette_color(arg->aes_id, aes_object_shape_pixel(
-			arg->aes_id, p, &arg->iterator), &color))
-		return true;
+	if (!aes_object_shape_layers(arg->clip,
+			&arg->iterator, draw_rsc_layer, arg))
+		return false;
 
-	pixel->r = (0xffff * color.r + 500) / 1000;
-	pixel->g = (0xffff * color.g + 500) / 1000;
-	pixel->b = (0xffff * color.b + 500) / 1000;
-	pixel->a =  0xffff;
+draw:
+	*pixel = arg->buffer.px[arg->buffer.i++];
 
 	return true;
 }

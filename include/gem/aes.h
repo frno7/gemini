@@ -200,6 +200,18 @@ struct aes_object_shape_iterator {
 };
 
 int aes_object_shape_pixel(aes_id_t aes_id, const struct aes_point p,
-	struct aes_object_shape_iterator *iterator);
+	const struct aes_object_shape *shape);
+
+struct aes_object_shape_layer {
+	struct aes_object_shape_layer *next;
+	struct aes_object_shape shape;
+};
+
+typedef bool (*aes_object_shape_layer_f)(const struct aes_area clip,
+	const struct aes_object_shape_layer *layers, void *arg);
+
+bool aes_object_shape_layers(struct aes_area clip,
+	struct aes_object_shape_iterator *iterator,
+	const aes_object_shape_layer_f f, void *arg);
 
 #endif /* _GEM_AES_H */
