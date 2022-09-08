@@ -130,4 +130,10 @@ static inline struct aes_area aes_area_intersection(
 		} : (struct aes_area) { };
 }
 
+static inline bool aes_area_degenerate(struct aes_area area)
+{
+	return area.r.w <= 0 ||
+	       area.r.h <= 0;
+}
+
 #endif /* _GEM_AES_AREA_H */
