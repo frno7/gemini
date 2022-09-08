@@ -32,7 +32,7 @@ static struct aes_object_border aes_object_shape_border(
 	return (struct aes_object_border) { };
 }
 
-static struct aes_object_simple_shape_pos aes_object_simple_shape(
+static struct aes_object_simple_shape_enumerator aes_object_simple_shape(
 	const int i, struct aes_object_shape *simple,
 	struct aes_object_shape shape)
 {
@@ -96,18 +96,18 @@ static struct aes_object_simple_shape_pos aes_object_simple_shape(
 		*simple = shape;
 	}
 
-	return (struct aes_object_simple_shape_pos) { .i = i, .n = n };
+	return (struct aes_object_simple_shape_enumerator) { .i = i, .n = n };
 }
 
-struct aes_object_simple_shape_pos aes_object_first_simple_shape(
+struct aes_object_simple_shape_enumerator aes_object_first_simple_shape(
 	struct aes_object_shape *simple, const struct aes_object_shape shape)
 {
 	return aes_object_simple_shape(0, simple, shape);
 }
 
-struct aes_object_simple_shape_pos aes_object_next_simple_shape(
+struct aes_object_simple_shape_enumerator aes_object_next_simple_shape(
 	struct aes_object_shape *simple, const struct aes_object_shape shape,
-	struct aes_object_simple_shape_pos pos)
+	struct aes_object_simple_shape_enumerator e)
 {
-	return aes_object_simple_shape(pos.i + 1, simple, shape);
+	return aes_object_simple_shape(e.i + 1, simple, shape);
 }

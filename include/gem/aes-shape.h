@@ -8,7 +8,7 @@
 
 #include "aes.h"
 
-struct aes_object_simple_shape_pos {
+struct aes_object_simple_shape_enumerator {
 	int i;
 	int n;
 };
@@ -19,16 +19,16 @@ struct aes_object_simple_shape_pos {
 	     valid__ = iterator->next((shape), (iterator)))
 
 #define aes_for_each_simple_object_shape(simple, shape)			\
-	for (struct aes_object_simple_shape_pos pos__ =			\
+	for (struct aes_object_simple_shape_enumerator e__ =		\
 			aes_object_first_simple_shape((simple), (shape));\
-	     pos__.i != pos__.n;					\
-	     pos__ = aes_object_next_simple_shape((simple), (shape), pos__))
+	     e__.i < e__.n;					\
+	     e__ = aes_object_next_simple_shape((simple), (shape), e__))
 
-struct aes_object_simple_shape_pos aes_object_first_simple_shape(
+struct aes_object_simple_shape_enumerator aes_object_first_simple_shape(
 	struct aes_object_shape *simple, const struct aes_object_shape shape);
 
-struct aes_object_simple_shape_pos aes_object_next_simple_shape(
+struct aes_object_simple_shape_enumerator aes_object_next_simple_shape(
 	struct aes_object_shape *simple, const struct aes_object_shape shape,
-	struct aes_object_simple_shape_pos pos);
+	struct aes_object_simple_shape_enumerator e);
 
 #endif /* _GEM_AES_SHAPE_H */
