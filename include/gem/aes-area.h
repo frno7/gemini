@@ -107,4 +107,27 @@ static inline struct aes_area aes_area_bounds(
 	};
 }
 
+static inline struct aes_area aes_area_intersection(
+	struct aes_area a,
+	struct aes_area b)
+{
+	const struct aes_point tlp = (struct aes_point) {
+		.x = max(a.p.x, b.p.x),
+		.y = max(a.p.y, b.p.y)
+	};
+	const struct aes_point brp = (struct aes_point) {
+		.x = min(a.p.x + a.r.w, b.p.x + b.r.w),
+		.y = min(a.p.y + a.r.h, b.p.y + b.r.h)
+	};
+
+	return tlp.x <= brp.x && tlp.y <= brp.y ?
+		(struct aes_area) {
+			.p = tlp,
+			.r = {
+				.w = brp.x - tlp.x,
+				.h = brp.y - tlp.y
+			},
+		} : (struct aes_area) { };
+}
+
 #endif /* _GEM_AES_AREA_H */
