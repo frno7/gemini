@@ -82,15 +82,11 @@ static bool aes_find_shape(struct aes_object_shape *shape,
 	struct aes_object_shape s;
 	bool found = false;
 
-	aes_for_each_object_shape (&s, iterator) {
-		struct aes_object_shape simple;
-
-		aes_for_each_simple_object_shape (&simple, s)
-			if (aes_point_within_area(p, simple.area)) {
-				*shape = simple;
-				found = true;
-			}
-	}
+	aes_for_each_object_shape (&s, iterator)
+		if (aes_point_within_area(p, s.area)) {
+			*shape = s;
+			found = true;
+		}
 
 	return found;
 }
@@ -352,9 +348,12 @@ static int aes_g_fboxtext_pixel(aes_id_t aes_id,
 int aes_object_shape_pixel(aes_id_t aes_id, const struct aes_point p,
 	struct aes_object_shape_iterator *iterator)
 {
+	struct aes_object_simple_shape_iterator_arg simple_arg;
+	struct aes_object_shape_iterator i =
+		aes_object_simple_shape_iterator(iterator, &simple_arg);
 	struct aes_object_shape shape;
 
-	if (!aes_find_shape(&shape, p, iterator))
+	if (!aes_find_shape(&shape, p, &i))
 		return -1;
 
 	switch (shape.type.g) {
