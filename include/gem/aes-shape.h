@@ -14,9 +14,9 @@ struct aes_object_simple_shape_enumerator {
 };
 
 #define aes_for_each_object_shape(shape, iterator)			\
-	for (bool valid__ = iterator->first((shape), (iterator));	\
+	for (bool valid__ = (iterator)->first((shape), (iterator));	\
 	     valid__;							\
-	     valid__ = iterator->next((shape), (iterator)))
+	     valid__ = (iterator)->next((shape), (iterator)))
 
 #define aes_for_each_simple_object_shape(simple, shape)			\
 	for (struct aes_object_simple_shape_enumerator e__ =		\
