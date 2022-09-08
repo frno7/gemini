@@ -41,4 +41,7 @@ struct aes_object_shape_iterator aes_object_simple_shape_iterator(
 	struct aes_object_shape_iterator *iterator,
 	struct aes_object_simple_shape_iterator_arg *arg);
 
+struct aes_area aes_object_shape_bounds(
+	struct aes_object_shape_iterator *iterator);
+
 #endif /* _GEM_AES_SHAPE_H */

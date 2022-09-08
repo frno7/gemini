@@ -8,6 +8,7 @@
 
 #include <gem/aes.h>
 #include <gem/aes-rsc.h>
+#include <gem/aes-shape.h>
 #include <gem/rsc.h>
 #include <gem/rsc-map.h>
 
@@ -695,9 +696,9 @@ static bool draw_rsc_image(uint16_t *width, uint16_t *height, void *arg_)
 	struct draw_rsc_arg *arg = arg_;
 	struct rsc_object *tree = rsc_tree_at_index(++arg->i, arg->rsc);
 
-	arg->bounds = aes_rsc_tree_bounds(arg->aes_id, tree, arg->rsc);
 	arg->iterator = aes_rsc_object_shape_iterator(
 		arg->aes_id, tree, arg->rsc, &arg->arg);
+	arg->bounds = aes_object_shape_bounds(&arg->iterator);
 
 	*width  = arg->bounds.r.w;
 	*height = arg->bounds.r.h;
