@@ -214,4 +214,7 @@ bool aes_object_shape_layers(struct aes_area clip,
 	struct aes_object_shape_iterator *iterator,
 	const aes_object_shape_layer_f f, void *arg);
 
+bool aes_find_object_shape(struct aes_object_shape *shape,
+	const struct aes_point p, struct aes_object_shape_iterator *iterator);
+
 #endif /* _GEM_AES_H */
