@@ -143,4 +143,28 @@ static inline bool aes_area_overlap(
 	return !aes_area_degenerate(aes_area_intersection(a, b));
 }
 
+struct aes_area_subdivision_enumerator {
+	int i;
+	struct aes_area s[4];
+};
+
+struct aes_area_subdivision_enumerator aes_area_subdivide(
+	const struct aes_area a,
+	const struct aes_area b);
+
+#define aes_for_each_area_subdivision(s_, a_, b_)			\
+	for (struct aes_area_subdivision_enumerator subdivision__ =	\
+		aes_area_subdivide((a_), (b_));				\
+	     ({								\
+	        const bool valid__ =					\
+			subdivision__.i < ARRAY_SIZE(subdivision__.s);	\
+		if (valid__)						\
+			*(s_) = subdivision__.s[subdivision__.i];	\
+		valid__;						\
+	     });							\
+	     subdivision__.i++)						\
+		if (aes_area_degenerate(subdivision__.s[subdivision__.i]))\
+			continue;					\
+		else
+
 #endif /* _GEM_AES_AREA_H */
