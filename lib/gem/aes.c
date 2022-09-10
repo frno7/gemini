@@ -8,6 +8,7 @@
 #include <gem/aes-filter.h>
 #include <gem/aes-pixel.h>
 #include <gem/aes-shape.h>
+#include <gem/aes-simple.h>
 #include <gem/vdi_.h>
 
 #include "internal/assert.h"

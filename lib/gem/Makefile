@@ -9,6 +9,7 @@ GEM_SRC =								\
 	lib/gem/aes-pixel.c						\
 	lib/gem/aes-rsc.c						\
 	lib/gem/aes-shape.c						\
+	lib/gem/aes-simple.c						\
 	lib/gem/fnt.c							\
 	lib/gem/rsc.c							\
 	lib/gem/rsc-map.c						\
