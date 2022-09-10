@@ -5,6 +5,7 @@ STORAGE_SRC = lib/gem/storage.c
 GEM_SRC =								\
 	lib/gem/aes.c							\
 	lib/gem/aes-area.c						\
+	lib/gem/aes-filter.c						\
 	lib/gem/aes-pixel.c						\
 	lib/gem/aes-rsc.c						\
 	lib/gem/aes-shape.c						\

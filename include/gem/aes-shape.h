@@ -41,20 +41,6 @@ struct aes_object_shape_iterator aes_object_simple_shape_iterator(
 	struct aes_object_shape_iterator *iterator,
 	struct aes_object_simple_shape_iterator_arg *arg);
 
-typedef bool (*aes_object_filter_shape_f)(
-	struct aes_object_shape *shape, void *arg);
-
-struct aes_object_filter_shape_iterator_arg {
-	struct aes_object_shape_iterator iterator;
-	aes_object_filter_shape_f f;
-	void *f_arg;
-};
-
-struct aes_object_shape_iterator aes_object_filter_shape_iterator(
-	aes_object_filter_shape_f f, void *f_arg,
-	struct aes_object_shape_iterator *iterator,
-	struct aes_object_filter_shape_iterator_arg *arg);
-
 struct aes_area aes_object_shape_bounds(
 	struct aes_object_shape_iterator *iterator);
 
