@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include <gem/aes.h>
+#include <gem/aes-layer.h>
 #include <gem/aes-rsc.h>
 #include <gem/aes-shape.h>
 #include <gem/rsc.h>
