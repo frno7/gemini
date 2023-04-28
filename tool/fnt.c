@@ -22,6 +22,7 @@ char progname[] = "fnt";
 static struct {
 	int identify;
 	int diagnostic;
+	char *format;
 	const char *input;
 } option;
 
@@ -40,6 +41,7 @@ static void help(FILE *file)
 "\n"
 "    --identify            exit sucessfully if the file is a valid FNT\n"
 "    --diagnostic          display diagnostic warnings and errors\n"
+"    --format <type>       display format type \"text\"\n"
 "\n",
 		progname);
 }
@@ -61,16 +63,19 @@ static void NORETURN version_exit(void)
 static void parse_options(int argc, char **argv)
 {
 	static const struct option options[] = {
-		{ "help",       no_argument, NULL,               0 },
-		{ "version",    no_argument, NULL,               0 },
-		{ "identify",   no_argument, &option.identify,   1 },
-		{ "diagnostic", no_argument, &option.diagnostic, 1 },
+		{ "help",       no_argument,       NULL,               0 },
+		{ "version",    no_argument,       NULL,               0 },
+		{ "identify",   no_argument,       &option.identify,   1 },
+		{ "diagnostic", no_argument,       &option.diagnostic, 1 },
+		{ "format",     required_argument, NULL,               0 },
 		{ NULL, 0, NULL, 0 }
 	};
 
 #define OPT(option) (strcmp(options[index].name, (option)) == 0)
 
 	argv[0] = progname;	/* For better getopt_long error messages. */
+
+	option.format = "text";
 
 	for (;;) {
 		int index = 0;
@@ -84,6 +89,8 @@ static void parse_options(int argc, char **argv)
 				goto opt_h;
 			else if (OPT("version"))
 				version_exit();
+			else if (OPT("format"))
+				option.format = optarg;
 			break;
 
 opt_h:		case 'h':
@@ -237,7 +244,10 @@ int main(int argc, char *argv[])
 	if (!fnt_valid_diagnostic(&fnt, &print_fnt_diagnostic, NULL))
 		goto err;
 
-	print_fnt_info(&fnt);
+	if (strcmp(option.format, "text") == 0)
+		print_fnt_info(&fnt);
+	else
+		pr_fatal_error("unrecognised format \"%s\"\n", option.format);
 
 	file_free(&f);
 
