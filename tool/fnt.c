@@ -163,8 +163,9 @@ static void print_fnt_char(const uint16_t c, const struct fnt *fnt)
 {
 	const int w = fnt_char_width(c, fnt);
 
-	printf("char 0x%x unicode 0x%x\n",
-		c, charset_atari_st_to_utf32(c, NULL));
+	printf("char 0x%x unicode 0x%x %s\n", c,
+		charset_atari_st_to_utf32(c, NULL),
+		charset_atari_st_to_name(c, NULL));
 
 	printf("char width %d spacing %d\n", w,
 		fnt->header->flags.horizontal ?
