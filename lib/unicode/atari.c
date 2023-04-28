@@ -272,6 +272,11 @@ unicode_t charset_atari_st_to_utf32(uint8_t c, void *arg)
 	return atari_st_charset[c].code;
 }
 
+const char *charset_atari_st_to_name(uint8_t c, void *arg)
+{
+	return atari_st_charset[c].name;
+}
+
 uint8_t utf32_to_charset_atari_st(unicode_t u, void *arg)
 {
 	for (int c = 0; c < ARRAY_SIZE(atari_st_charset); c++)
