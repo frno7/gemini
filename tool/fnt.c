@@ -41,7 +41,7 @@ static void help(FILE *file)
 "\n"
 "    --identify            exit sucessfully if the file is a valid FNT\n"
 "    --diagnostic          display diagnostic warnings and errors\n"
-"    --format <type>       display format type \"text\"\n"
+"    --format <text|bdf>   display format type text (default) or bdf\n"
 "\n",
 		progname);
 }
@@ -198,6 +198,104 @@ FNT_HEADER_FIELD(FNT_HEADER_FIELD_PRINT)
 		print_fnt_char(c, fnt);
 }
 
+static void print_bdf_char(const uint16_t c, const struct fnt *fnt)
+{
+	const int w = fnt_char_width(c, fnt);
+
+	puts("");
+
+	printf("STARTCHAR %s\n", charset_atari_st_to_name(c, NULL));
+	printf("ENCODING %u\n", charset_atari_st_to_utf32(c, NULL));
+
+	printf("SWIDTH %d 0\n", fnt->header->max_char_width*
+		72 * 1000 / 75 / fnt->header->point);
+	printf("DWIDTH %d 0\n", w);
+
+	printf("BBX %d %d %d %d\n", w,
+		fnt->header->bitmap_lines,
+		0, fnt->header->ascent - fnt->header->bitmap_lines);
+
+	puts("BITMAP");
+	for (int y = 0; y < fnt->header->bitmap_lines; y++) {
+		uint8_t m = 0;
+
+		for (int x = 0; x < w; x++) {
+			if (x >= 8 && x % 8 == 0) {
+				printf("%02X", m);
+				m = 0;
+			}
+
+			if (fnt_char_pixel(x, y, c, fnt))
+				m |= 0x80 >> (x % 8);
+		}
+
+		printf("%02X\n", m);
+	}
+
+	puts("ENDCHAR");
+}
+
+static void print_bdf(const struct fnt *fnt)
+{
+	printf("STARTFONT 2.1\n");
+
+	printf("FONT %s\n", fnt->header->name.s);
+	printf("SIZE %u 75 75\n",
+		fnt->header->ascent +
+		fnt->header->descent);
+	printf("FONTBOUNDINGBOX %d %d %d %d\n",
+		fnt->header->max_char_width,
+		fnt->header->bitmap_lines,
+		0, 0);
+
+	puts("STARTPROPERTIES 25");
+	puts("FONTNAME_REGISTRY \"\"");
+	puts("FOUNDRY \"\"");
+	printf("FAMILY_NAME \"%s\"\n", fnt->header->name.s);
+	puts("WEIGHT_NAME \"Medium\"");
+	puts("SLANT \"\"");
+	puts("SETWIDTH_NAME \"Normal\"");
+	puts("ADD_STYLE_NAME \"Regular\"");
+	printf("PIXEL_SIZE %d\n",
+		fnt->header->ascent +
+		fnt->header->descent);
+	printf("POINT_SIZE %d\n",
+		fnt->header->point * 10); /* Decipoints */
+	puts("RESOLUTION_X 75");
+	puts("RESOLUTION_Y 75");
+	printf("SPACING \"%s\"\n", fnt->header->flags.monospace ? "M" : "P");
+	printf("AVERAGE_WIDTH %d\n",
+		fnt->header->max_char_width * 10); /* Decipixels */
+	puts("CHARSET_REGISTRY \"ISO10646\"");
+	puts("CHARSET_ENCODING \"1\"");
+	/* Bitmap fonts are not copyrightable, hence public domain */
+	puts("COPYRIGHT \"Public domain\"");
+	printf("FACE_NAME \"%s\"\n", fnt->header->name.s);
+	printf("X_HEIGHT %d\n", fnt->header->ascent);
+	printf("CAP_HEIGHT %d\n",
+		fnt->header->ascent +
+		fnt->header->descent);
+	puts("WEIGHT 10");
+	puts("RESOLUTION 99");
+	printf("QUAD_WIDTH %d\n", fnt->header->max_char_width);
+	puts("DEFAULT_CHAR 0");
+	printf("FONT_DESCENT %d\n",
+		fnt->header->descent +
+		fnt->header->bottom);
+	printf("FONT_ASCENT %d\n",
+		fnt->header->ascent +
+		fnt->header->descent +
+		fnt->header->bottom);
+	puts("ENDPROPERTIES");
+
+	printf("\nCHARS %u\n", 1 + fnt->header->last - fnt->header->first);
+
+	for (uint16_t c = fnt->header->first; c <= fnt->header->last; c++)
+		print_bdf_char(c, fnt);
+
+	puts("\nENDFONT");
+}
+
 static void print_fnt_warning(const char *msg, void *arg)
 {
 	dprintf(STDERR_FILENO, "%s: warning: %s\n", option.input, msg);
@@ -246,6 +344,8 @@ int main(int argc, char *argv[])
 
 	if (strcmp(option.format, "text") == 0)
 		print_fnt_info(&fnt);
+	else if (strcmp(option.format, "bdf") == 0)
+		print_bdf(&fnt);
 	else
 		pr_fatal_error("unrecognised format \"%s\"\n", option.format);
 

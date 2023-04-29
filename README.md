@@ -81,7 +81,8 @@ Options:
 
     -h, --help            display this help and exit
     --version             display version and exit
-
+    --format <text|bdf>   display format type text (default) or bdf
     --identify            exit sucessfully if the file is a valid FNT
     --diagnostic          display diagnostic warnings and errors
+
 ```
