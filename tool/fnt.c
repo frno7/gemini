@@ -213,7 +213,7 @@ static void print_bdf_char(const uint16_t c, const struct fnt *fnt)
 
 	printf("BBX %d %d %d %d\n", w,
 		fnt->header->bitmap_lines,
-		0, fnt->header->ascent - fnt->header->bitmap_lines);
+		0, -fnt->header->descent);
 
 	puts("BITMAP");
 	for (int y = 0; y < fnt->header->bitmap_lines; y++) {
@@ -239,53 +239,44 @@ static void print_bdf(const struct fnt *fnt)
 {
 	printf("STARTFONT 2.1\n");
 
-	printf("FONT %s\n", fnt->header->name.s);
-	printf("SIZE %u 75 75\n",
-		fnt->header->ascent +
-		fnt->header->descent);
+	printf("FONT -misc-%s-medium-r-normal--%d-%d-72-72-C-%d-ISO10646-1\n",
+		fnt->header->name.s,
+		fnt->header->bitmap_lines,
+		fnt->header->bitmap_lines * 10, /* Decipoints */
+		fnt->header->max_char_width * 10); /* Decipixels */
+	printf("SIZE %u 72 72\n",
+		fnt->header->bitmap_lines);
 	printf("FONTBOUNDINGBOX %d %d %d %d\n",
 		fnt->header->max_char_width,
 		fnt->header->bitmap_lines,
-		0, 0);
+		0,
+		-fnt->header->descent);
 
-	puts("STARTPROPERTIES 25");
-	puts("FONTNAME_REGISTRY \"\"");
-	puts("FOUNDRY \"\"");
+	puts("STARTPROPERTIES 17");
+	puts("FOUNDRY \"misc\"");
 	printf("FAMILY_NAME \"%s\"\n", fnt->header->name.s);
 	puts("WEIGHT_NAME \"Medium\"");
-	puts("SLANT \"\"");
+	puts("SLANT \"R\"");
 	puts("SETWIDTH_NAME \"Normal\"");
-	puts("ADD_STYLE_NAME \"Regular\"");
 	printf("PIXEL_SIZE %d\n",
-		fnt->header->ascent +
-		fnt->header->descent);
+		fnt->header->bitmap_lines);
 	printf("POINT_SIZE %d\n",
-		fnt->header->point * 10); /* Decipoints */
-	puts("RESOLUTION_X 75");
-	puts("RESOLUTION_Y 75");
-	printf("SPACING \"%s\"\n", fnt->header->flags.monospace ? "M" : "P");
+		fnt->header->bitmap_lines * 10); /* Decipoints */
+	puts("RESOLUTION_X 72");
+	puts("RESOLUTION_Y 72");
+	printf("SPACING \"%s\"\n", fnt->header->flags.monospace ? "C" : "P");
 	printf("AVERAGE_WIDTH %d\n",
 		fnt->header->max_char_width * 10); /* Decipixels */
 	puts("CHARSET_REGISTRY \"ISO10646\"");
 	puts("CHARSET_ENCODING \"1\"");
 	/* Bitmap fonts are not copyrightable, hence public domain */
 	puts("COPYRIGHT \"Public domain\"");
-	printf("FACE_NAME \"%s\"\n", fnt->header->name.s);
-	printf("X_HEIGHT %d\n", fnt->header->ascent);
-	printf("CAP_HEIGHT %d\n",
-		fnt->header->ascent +
-		fnt->header->descent);
-	puts("WEIGHT 10");
-	puts("RESOLUTION 99");
-	printf("QUAD_WIDTH %d\n", fnt->header->max_char_width);
-	puts("DEFAULT_CHAR 0");
-	printf("FONT_DESCENT %d\n",
-		fnt->header->descent +
-		fnt->header->bottom);
+	puts("DEFAULT_CHAR 32");
 	printf("FONT_ASCENT %d\n",
-		fnt->header->ascent +
-		fnt->header->descent +
-		fnt->header->bottom);
+		fnt->header->bitmap_lines -
+		fnt->header->descent);
+	printf("FONT_DESCENT %d\n",
+		fnt->header->descent);
 	puts("ENDPROPERTIES");
 
 	printf("\nCHARS %u\n", 1 + fnt->header->last - fnt->header->first);
